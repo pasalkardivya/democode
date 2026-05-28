@@ -12,16 +12,18 @@
   .cust-content { width: 100%; max-width: 100% !important; padding: 0; }
   .cust-section { width: 100%; }
   .cust-section-inner { max-width: 1400px; margin: 0 auto; padding: 44px 40px; }
-  .cust-hero-bg {
-    background: linear-gradient(135deg, rgba(45,42,56,0.7), rgba(45,42,56,0.4)),
-                url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1600&q=80');
-    background-size: cover; background-position: center; min-height: 420px;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    position: relative; overflow: hidden; width: 100%;
+
+  .cust-hero-banner {
+    background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.3)),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=80') center/cover;
+    min-height: 380px; display: flex; align-items: center; justify-content: center;
+    text-align: center; position: relative; overflow: hidden; width: 100%;
   }
-  .cust-hero-bg h1 { font-size: 56px; font-weight: 800; color: white; text-shadow: 0 4px 30px rgba(0,0,0,0.5); letter-spacing: -0.5px; }
-  .cust-hero-bg h1 span { color: #f5b342; }
-  .cust-hero-bg p { font-size: 20px; color: rgba(255,255,255,0.85); margin-top: 12px; }
+  .cust-hero-center { max-width: 1400px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 1; }
+  .cust-hero-center h1 { font-size: 52px; font-weight: 800; color: white; text-shadow: 0 4px 30px rgba(0,0,0,0.4); letter-spacing: -0.5px; }
+  .cust-hero-center h1 span { color: #fcd34d; }
+  .cust-hero-center p { font-size: 20px; color: rgba(255,255,255,0.85); margin-top: 12px; }
+  @media (max-width: 768px) { .cust-hero-center h1 { font-size: 32px; } .cust-hero-center p { font-size: 16px; } .cust-hero-banner { min-height: 220px; } }
   .gallery-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-bottom: 36px;
   }
@@ -76,19 +78,33 @@
   .loc-card h4 { font-size: 18px; font-weight: 600; color: #2d2b38; margin-bottom: 6px; }
   .loc-card p { font-size: 15px; color: #5a5768; line-height: 1.7; }
   @media (max-width: 768px) {
-    .cust-hero-bg h1 { font-size: 34px; }
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
     .cust-section-inner { padding: 24px 16px; }
     .cust-header-inner { padding: 12px 16px; }
   }
-  .cust-header { background: white; border-bottom: 1px solid #e8e4dc; }
-  .cust-logo h2 { color: #2d2b38; font-size: 22px; }
-  .cust-logo h2 span { color: #d4a017; }
+  .cust-header {
+    background:
+      linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.25)),
+      url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=80') center/cover;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+  }
+  .cust-header-inner { position: relative; z-index: 1; }
+  .cust-logo h2 { color: #fff; }
+  .cust-logo h2 span { color: #fcd34d; }
+  .cust-logo .logo-icon { background: rgba(255,255,255,0.12); color: #fff; }
+  .cust-nav-item { color: rgba(255,255,255,0.75); }
+  .cust-nav-item:hover, .cust-nav-item.active { color: #fcd34d; }
+  .cust-user span { color: #fff; }
+  .cart-btn { background: rgba(255,255,255,0.12); color: #fff; }
+  .cart-btn:hover { background: rgba(255,255,255,0.2); }
+  .cust-header-right .avatar { background: rgba(255,255,255,0.15); color: #fff; }
+  .cust-logo h2 { font-size: 22px; }
+  .cust-logo h2 span { color: #fcd34d; }
   .cust-logo .logo-icon { width: 40px; height: 40px; font-size: 20px; }
-  .cust-nav-item { color: #5a5768; font-size: 15px; padding: 10px 22px; }
-  .cust-nav-item:hover, .cust-nav-item.active { color: #d4a017; }
-  .cust-user span { color: #2d2b38; font-size: 15px; }
-  .cart-btn { background: #f4f1ea; color: #2d2b38; width: 44px; height: 44px; font-size: 18px; }
+  .cust-nav-item { font-size: 15px; padding: 10px 22px; }
+  .cust-user span { font-size: 15px; }
+  .cart-btn { width: 44px; height: 44px; font-size: 18px; }
   .room-card { background: white; border: 1px solid #e8e4dc; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 14px; overflow: hidden; }
   .room-card .room-info { padding: 20px 22px; }
   .room-card .room-info h4 { color: #2d2b38; font-size: 18px; }
@@ -156,20 +172,25 @@
       <div class="cust-user">
         <div class="avatar" id="custAvatar">G</div>
         <span id="custName">Guest</span>
-        <a href="/login" style="color:#8a8798;font-size:12px;margin-left:8px;"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="/login" style="color:rgba(255,255,255,0.5);font-size:12px;margin-left:8px;"><i class="fas fa-sign-out-alt"></i></a>
       </div>
     </div>
   </div>
 </header>
+
+<!-- ===== HERO BANNER (shared across all tabs) ===== -->
+<div class="cust-hero-banner" id="custHeroBanner">
+  <div class="cust-hero-center">
+    <h1 id="heroTitle">Delicious Food, <span>Delivered to You</span></h1>
+    <p id="heroSubtitle">Explore handcrafted dishes from the freshest ingredients.</p>
+  </div>
+</div>
 
 <!-- ===== CUSTOMER CONTENT ===== -->
 <div class="cust-content">
 
   <!-- ===== ORDER FOOD ===== -->
   <section class="cust-section active" id="cust-food">
-    <div class="cust-hero-bg">
-      <div><h1>Delicious Food, <span>Delivered to You</span></h1><p>Explore handcrafted dishes from the freshest ingredients.</p></div>
-    </div>
     <div class="cust-section-inner">
       <div class="food-tabs">
         <button class="food-tab active" onclick="switchFoodTab('breakfast')"><i class="fas fa-sun icon-bright"></i> Breakfast</button>
@@ -183,9 +204,6 @@
 
   <!-- ===== BOOK ROOM ===== -->
   <section class="cust-section" id="cust-rooms">
-    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.7),rgba(45,42,56,0.35)),url('https://images.unsplash.com/photo-1562778612-e1e0cda9915c?w=1600&q=80');">
-      <div><h1>Book Your <span>Stay</span></h1><p>Comfortable rooms &amp; special event packages at Lavasa.</p></div>
-    </div>
     <div class="cust-section-inner">
       <h3 class="section-title"><i class="fas fa-bed icon-blue"></i> Accommodation</h3>
       <div class="room-grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));">
@@ -236,9 +254,6 @@
 
   <!-- ===== LOCATION ===== -->
   <section class="cust-section" id="cust-location">
-    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.75),rgba(45,42,56,0.5)),url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80');">
-      <div><h1>Our <span>Location</span></h1><p>Find us in the heart of Lavasa — India's最美的 hill station.</p></div>
-    </div>
     <div class="cust-section-inner">
       <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:30px;margin-bottom:32px;">
         <div>
@@ -286,9 +301,6 @@
 
   <!-- ===== HIGHLIGHTS ===== -->
   <section class="cust-section" id="cust-highlights">
-    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.75),rgba(45,42,56,0.5)),url('https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1600&q=80');">
-      <div><h1>Event <span>Highlights</span></h1><p>Memorable moments from our guests' celebrations at Lodgings.</p></div>
-    </div>
     <div class="cust-section-inner">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;">
         <div class="event-card">
@@ -345,9 +357,6 @@
 
   <!-- ===== MY STAYS ===== -->
   <section class="cust-section" id="cust-stays">
-    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.75),rgba(45,42,56,0.5)),url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1600&q=80');">
-      <div><h1>My <span>Stays</span></h1><p>Your booking history, food orders, and event bookings at Lodgings.</p></div>
-    </div>
     <div class="cust-section-inner">
       <h3 class="section-title"><i class="fas fa-bed icon-blue"></i> Room Bookings</h3>
       <div id="myRoomBookings"><div class="empty-stays"><i class="fas fa-bed"></i><br>No room bookings yet.</div></div>
@@ -460,11 +469,20 @@ const userData = JSON.parse(sessionStorage.getItem('lodgings_user') || '{}');
 if (userData.name) { document.getElementById('custName').textContent = userData.name; document.getElementById('custAvatar').textContent = userData.name.charAt(0).toUpperCase(); }
 if (!userData.role) { window.location.href = '/login'; }
 
+const heroContent = {
+  food: { title: 'Delicious Food, <span>Delivered to You</span>', sub: 'Explore handcrafted dishes from the freshest ingredients.' },
+  rooms: { title: 'Book Your <span>Stay</span>', sub: 'Comfortable rooms &amp; special event packages at Lavasa.' },
+  location: { title: 'Our <span>Location</span>', sub: 'Find us in the heart of Lavasa — India\'s最美的 hill station.' },
+  highlights: { title: 'Event <span>Highlights</span>', sub: 'Memorable moments from our guests\' celebrations at Lodgings.' },
+  stays: { title: 'My <span>Stays</span>', sub: 'Your booking history, food orders, and event bookings at Lodgings.' }
+};
 function custNavigate(page) {
   document.querySelectorAll('.cust-nav-item').forEach(i => i.classList.remove('active'));
   document.querySelectorAll('.cust-section').forEach(s => s.classList.remove('active'));
   document.querySelector(`.cust-nav-item[onclick*="'${page}'"]`).classList.add('active');
   document.getElementById('cust-' + page).classList.add('active');
+  document.getElementById('heroTitle').innerHTML = heroContent[page].title;
+  document.getElementById('heroSubtitle').textContent = heroContent[page].sub;
   if (page === 'stays') renderMyStays();
 }
 
