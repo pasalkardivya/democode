@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Dashboard - Lodgings</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #0a0e27; color: #e8eaf6; }
+    .navbar {
+        background: linear-gradient(135deg, #0d1137, #1a1f4e);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding: 18px 40px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .navbar h1 { font-size: 24px; font-weight: 700; }
+    .navbar h1 span { color: #ffd700; }
+    .navbar a { color: white; text-decoration: none; font-size: 14px; background: #4f8cff; padding: 8px 18px; border-radius: 8px; }
+    .navbar a:hover { background: #3a7be8; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 28px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+    .card {
+        background: rgba(255,255,255,0.04); backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+        padding: 24px; text-align: center; transition: 0.25s;
+    }
+    .card:hover { transform: translateY(-2px); border-color: rgba(79,140,255,0.2); }
+    .card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #8890b0; margin-bottom: 8px; }
+    .card p { font-size: 32px; font-weight: 700; }
+    .card .sub { font-size: 12px; color: #8890b0; margin-top: 4px; }
+    .section {
+        background: rgba(255,255,255,0.04); backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 28px; margin-bottom: 24px;
+    }
+    .section h2 { font-size: 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    .section h2 i { color: #ffd700; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table th { text-align: left; padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8890b0; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    table tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge-success { background: rgba(0,200,83,0.12); color: #00c853; }
+    .badge-failed { background: rgba(255,82,82,0.12); color: #ff5252; }
+    .endpoint-list { list-style: none; }
+    .endpoint-list li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
+    .endpoint-list li:last-child { border-bottom: none; }
+    .method { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; margin-right: 8px; }
+    .method-get { background: #22c55e; }
+    .method-post { background: #3b82f6; }
+    .method-put { background: #f59e0b; }
+    .method-delete { background: #ef4444; }
+    .partner-card {
+        display: flex; align-items: center; gap: 20px; padding: 20px;
+        background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);
+    }
+    .partner-logo {
+        width: 56px; height: 56px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700;
+        flex-shrink: 0;
+    }
+    .partner-logo.zomato { background: #e23744; color: white; }
+    .partner-logo.swiggy { background: #fc8019; color: white; }
+    .partner-info h4 { font-size: 16px; font-weight: 600; }
+    .partner-info p { font-size: 13px; color: #8890b0; }
+    .partner-stats { display: flex; gap: 24px; margin-top: 8px; }
+    .partner-stats span { font-size: 13px; }
+    .partner-stats strong { color: #ffd700; }
+    .back-link {
+        display: inline-flex; align-items: center; gap: 6px; color: #4f8cff;
+        text-decoration: none; font-size: 14px; margin-bottom: 16px;
+    }
+    .back-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <h1>Lodgings<span>.</span> API Dashboard</h1>
+    <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div class="container">
+
+    <a href="/dashboard" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    <div class="stats-grid">
+        <div class="card">
+            <h3>Total API Calls</h3>
+            <p th:text="${totalCalls}">0</p>
+            <div class="sub">All time</div>
+        </div>
+        <div class="card">
+            <h3>Today</h3>
+            <p th:text="${todayCalls}">0</p>
+            <div class="sub">Calls today</div>
+        </div>
+        <div class="card">
+            <h3>This Week</h3>
+            <p th:text="${weekCalls}">0</p>
+            <div class="sub">Calls this week</div>
+        </div>
+        <div class="card">
+            <h3>This Month</h3>
+            <p th:text="${monthCalls}">0</p>
+            <div class="sub">Calls this month</div>
+        </div>
+    </div>
+
+    <!-- Partner Section -->
+    <div class="section">
+        <h2><i class="fas fa-handshake"></i> Partner Integrations</h2>
+        <div class="grid-2">
+            <div class="partner-card">
+                <div class="partner-logo zomato">Z</div>
+                <div class="partner-info">
+                    <h4>Zomato</h4>
+                    <p>Food delivery &amp; restaurant partner</p>
+                    <div class="partner-stats">
+                        <span>Today: <strong th:text="${zomatoToday}">0</strong></span>
+                        <span>Total: <strong th:text="${zomatoTotal}">0</strong></span>
+                    </div>
+                </div>
+            </div>
+            <div class="partner-card">
+                <div class="partner-logo swiggy">S</div>
+                <div class="partner-info">
+                    <h4>Swiggy</h4>
+                    <p>Food delivery &amp; restaurant partner</p>
+                    <div class="partner-stats">
+                        <span>Today: <strong th:text="${swiggyToday}">0</strong></span>
+                        <span>Total: <strong th:text="${swiggyTotal}">0</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="section">
+            <h2><i class="fas fa-chart-bar"></i> Calls Per Endpoint (Today)</h2>
+            <ul class="endpoint-list">
+                <li><span><span class="method method-get">GET</span>/api/listings</span><strong th:text="${todayPerEndpoint.get('/api/listings')}">0</strong></li>
+                <li><span><span class="method method-post">POST</span>/api/create</span><strong th:text="${todayPerEndpoint.get('/api/create')}">0</strong></li>
+                <li><span><span class="method method-put">PUT</span>/api/update</span><strong th:text="${todayPerEndpoint.get('/api/update')}">0</strong></li>
+                <li><span><span class="method method-delete">DELETE</span>/api/cancel</span><strong th:text="${todayPerEndpoint.get('/api/cancel')}">0</strong></li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-check-circle"></i> Success vs Failed</h2>
+            <ul class="endpoint-list">
+                <li><span><span class="badge badge-success">SUCCESS</span></span><strong th:text="${callsPerStatus.get('SUCCESS') != null ? callsPerStatus.get('SUCCESS') : 0}">0</strong></li>
+                <li><span><span class="badge badge-failed">FAILED</span></span><strong th:text="${callsPerStatus.get('FAILED') != null ? callsPerStatus.get('FAILED') : 0}">0</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-history"></i> Recent API Calls</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Endpoint</th><th>Method</th><th>Status</th><th>Partner</th><th>IP Address</th><th>Timestamp</th></tr></thead>
+            <tbody>
+                <tr th:each="usage : ${recentUsage}">
+                    <td th:text="${usage.id}">1</td>
+                    <td th:text="${usage.endpoint}">/api/listings</td>
+                    <td><span class="method" th:classappend="${usage.method == 'GET' ? 'method-get' : usage.method == 'POST' ? 'method-post' : usage.method == 'PUT' ? 'method-put' : 'method-delete'}" th:text="${usage.method}">GET</span></td>
+                    <td><span class="badge" th:classappend="${usage.status == 'SUCCESS' ? 'badge-success' : 'badge-failed'}" th:text="${usage.status}">SUCCESS</span></td>
+                    <td th:text="${usage.partner != null ? usage.partner : 'Unknown'}">Unknown</td>
+                    <td th:text="${usage.ipAddress}">127.0.0.1</td>
+                    <td th:text="${usage.timestamp}">2024-01-01 12:00</td>
+                </tr>
+                <tr th:if="${recentUsage.isEmpty()}">
+                    <td colspan="7" style="padding:20px;color:#8890b0;text-align:center;">No API calls recorded yet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-book"></i> API Documentation for Partners (Zomato &amp; Swiggy)</h2>
+        <table>
+            <thead><tr><th>Endpoint</th><th>Method</th><th>Description</th><th>Auth Required</th></tr></thead>
+            <tbody>
+                <tr><td><code>/api/listings</code></td><td><span class="method method-get">GET</span></td><td>List all bookings / customers</td><td>X-API-Key header</td></tr>
+                <tr><td><code>/api/create</code></td><td><span class="method method-post">POST</span></td><td>Create a new booking</td><td>X-API-Key header</td></tr>
+                <tr><td><code>/api/update/{id}</code></td><td><span class="method method-put">PUT</span></td><td>Update an existing booking by ID</td><td>X-API-Key header</td></tr>
+                <tr><td><code>/api/cancel/{id}</code></td><td><span class="method method-delete">DELETE</span></td><td>Cancel a booking by ID</td><td>X-API-Key header</td></tr>
+            </tbody>
+        </table>
+        <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="background:rgba(226,55,68,0.08);border:1px solid rgba(226,55,68,0.2);border-radius:8px;padding:14px;">
+                <strong style="color:#e23744;">Zomato Integration</strong>
+                <pre style="margin-top:6px;font-size:12px;color:#8890b0;">curl -H "X-API-Key: lodgings-partner-key-2024" \
+  -H "X-Partner: Zomato" \
+  http://localhost:8080/api/listings</pre>
+            </div>
+            <div style="background:rgba(252,128,25,0.08);border:1px solid rgba(252,128,25,0.2);border-radius:8px;padding:14px;">
+                <strong style="color:#fc8019;">Swiggy Integration</strong>
+                <pre style="margin-top:6px;font-size:12px;color:#8890b0;">curl -H "X-API-Key: lodgings-partner-key-2024" \
+  -H "X-Partner: Swiggy" \
+  http://localhost:8080/api/listings</pre>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

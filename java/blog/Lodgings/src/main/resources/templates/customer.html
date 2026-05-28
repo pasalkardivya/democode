@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lodgings — Customer Portal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { background: #f4f1ea; overflow-x: hidden; margin: 0; color: #2d2b38; }
+  .cust-header-inner { max-width: 1400px !important; margin: 0 auto !important; padding: 18px 40px; }
+  .cust-content { width: 100%; max-width: 100% !important; padding: 0; }
+  .cust-section { width: 100%; }
+  .cust-section-inner { max-width: 1400px; margin: 0 auto; padding: 44px 40px; }
+  .cust-hero-bg {
+    background: linear-gradient(135deg, rgba(45,42,56,0.7), rgba(45,42,56,0.4)),
+                url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1600&q=80');
+    background-size: cover; background-position: center; min-height: 420px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    position: relative; overflow: hidden; width: 100%;
+  }
+  .cust-hero-bg h1 { font-size: 56px; font-weight: 800; color: white; text-shadow: 0 4px 30px rgba(0,0,0,0.5); letter-spacing: -0.5px; }
+  .cust-hero-bg h1 span { color: #f5b342; }
+  .cust-hero-bg p { font-size: 20px; color: rgba(255,255,255,0.85); margin-top: 12px; }
+  .gallery-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-bottom: 36px;
+  }
+  .gallery-grid img {
+    width: 100%; height: 220px; object-fit: cover; border-radius: 14px;
+    transition: 0.3s; cursor: pointer; border: 2px solid rgba(0,0,0,0.04);
+  }
+  .gallery-grid img:hover { transform: scale(1.03); border-color: #d4a017; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .stay-card {
+    background: white; border: 1px solid #e8e4dc; border-radius: 14px;
+    padding: 26px 30px; margin-bottom: 16px; transition: 0.25s; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .stay-card:hover { border-color: #d4a017; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .stay-card .stay-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .stay-card .stay-header h4 { font-size: 18px; font-weight: 600; color: #2d2b38; }
+  .stay-card .stay-header .stay-badge { padding: 5px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+  .stay-card .stay-header .stay-badge.room { background: #e8f0fe; color: #2d6a9f; }
+  .stay-card .stay-header .stay-badge.food { background: #fef7e0; color: #d4a017; }
+  .stay-card .stay-body { font-size: 15px; color: #5a5768; }
+  .stay-card .stay-body .stay-row { display: flex; justify-content: space-between; padding: 6px 0; }
+  .empty-stays { text-align: center; padding: 80px 60px; color: #8a8798; font-size: 16px; }
+  .empty-stays i { font-size: 60px; margin-bottom: 16px; color: #ddd8ce; }
+  .icon-bright { color: #d4a017; }
+  .icon-blue { color: #2d6a9f; }
+  .event-card {
+    background: white; border: 1px solid #e8e4dc; border-radius: 14px;
+    overflow: hidden; transition: 0.25s; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .event-card:hover { transform: translateY(-3px); border-color: #d4a017; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+  .event-card img { width: 100%; height: 240px; object-fit: cover; display: block; }
+  .event-card .event-body { padding: 20px 24px; }
+  .event-card .event-body h4 { font-size: 18px; font-weight: 600; color: #2d2b38; margin-bottom: 8px; }
+  .event-card .event-body p { font-size: 14px; color: #5a5768; margin-bottom: 10px; }
+  .event-card .event-body .event-date { font-size: 13px; color: #d4a017; display: flex; align-items: center; gap: 4px; }
+  .section-title { font-size: 28px; font-weight: 700; margin-bottom: 26px; display: flex; align-items: center; gap: 14px; color: #2d2b38; }
+  .section-title i { font-size: 26px; }
+  .special-card {
+    background: white; border: 1px solid #e8e4dc;
+    border-radius: 14px; padding: 36px 30px; text-align: center; transition: 0.25s; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .special-card:hover { transform: translateY(-4px); border-color: #d4a017; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+  .special-card .special-icon { font-size: 52px; margin-bottom: 16px; }
+  .special-card h4 { font-size: 20px; font-weight: 600; color: #2d2b38; margin-bottom: 10px; }
+  .special-card p { font-size: 14px; color: #5a5768; margin-bottom: 16px; }
+  .special-card .special-price { font-size: 26px; font-weight: 700; color: #d4a017; margin-bottom: 16px; }
+  .special-card .special-price span { font-size: 14px; font-weight: 400; color: #8a8798; }
+  .loc-card {
+    background: white; border: 1px solid #e8e4dc;
+    border-radius: 14px; padding: 26px 30px; display: flex; align-items: flex-start; gap: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .loc-card .loc-icon { font-size: 30px; color: #d4a017; margin-top: 2px; }
+  .loc-card h4 { font-size: 18px; font-weight: 600; color: #2d2b38; margin-bottom: 6px; }
+  .loc-card p { font-size: 15px; color: #5a5768; line-height: 1.7; }
+  @media (max-width: 768px) {
+    .cust-hero-bg h1 { font-size: 34px; }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .cust-section-inner { padding: 24px 16px; }
+    .cust-header-inner { padding: 12px 16px; }
+  }
+  .cust-header { background: white; border-bottom: 1px solid #e8e4dc; }
+  .cust-logo h2 { color: #2d2b38; font-size: 22px; }
+  .cust-logo h2 span { color: #d4a017; }
+  .cust-logo .logo-icon { width: 40px; height: 40px; font-size: 20px; }
+  .cust-nav-item { color: #5a5768; font-size: 15px; padding: 10px 22px; }
+  .cust-nav-item:hover, .cust-nav-item.active { color: #d4a017; }
+  .cust-user span { color: #2d2b38; font-size: 15px; }
+  .cart-btn { background: #f4f1ea; color: #2d2b38; width: 44px; height: 44px; font-size: 18px; }
+  .room-card { background: white; border: 1px solid #e8e4dc; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 14px; overflow: hidden; }
+  .room-card .room-info { padding: 20px 22px; }
+  .room-card .room-info h4 { color: #2d2b38; font-size: 18px; }
+  .room-card .room-desc { color: #5a5768; font-size: 14px; }
+  .room-card .room-info img { border-radius: 14px 14px 0 0; }
+  .room-meta span { color: #5a5768; background: #f4f1ea; font-size: 13px; padding: 5px 12px; }
+  .room-price { color: #d4a017; font-size: 24px; }
+  .room-price span { color: #8a8798; font-size: 13px; }
+  .food-tabs { border-bottom: 2px solid #e8e4dc; margin-bottom: 24px; }
+  .food-tab { color: #5a5768; font-size: 15px; padding: 10px 24px; }
+  .food-tab:hover { color: #d4a017; }
+  .food-tab.active { color: #d4a017; border-bottom-color: #d4a017; }
+  .food-card { background: white; border: 1px solid #e8e4dc; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 14px; overflow: hidden; }
+  .food-card .food-body { padding: 16px 18px; }
+  .food-card .food-body h4 { color: #2d2b38; font-size: 16px; }
+  .food-card .food-body p { color: #5a5768; font-size: 13px; }
+  .food-price { color: #d4a017; font-size: 18px; }
+  .food-badge { background: #fef7e0; color: #d4a017; font-size: 11px; padding: 4px 12px; }
+  .modal { background: white; border-radius: 16px; }
+  .modal h3 { color: #2d2b38; font-size: 20px; }
+  .modal label { color: #5a5768; font-size: 14px; }
+  .modal input, .modal select { background: #f4f1ea; border: 1px solid #ddd8ce; color: #2d2b38; padding: 12px 14px; border-radius: 8px; font-size: 14px; }
+  .modal input:focus, .modal select:focus { border-color: #d4a017; }
+  .bill-card { background: #fef7e0; border: 1px solid #f0d78a; border-radius: 10px; padding: 16px 20px; }
+  .bill-row { color: #2d2b38; font-size: 14px; }
+  .pay-tab { color: #5a5768; background: #f4f1ea; font-size: 14px; padding: 10px 18px; }
+  .pay-tab.active { background: #d4a017; color: white; }
+  .cart-sidebar { background: white; }
+  .cart-header { background: #fef7e0; padding: 18px 20px; }
+  .cart-header h3 { font-size: 18px; }
+  .cart-item { border-bottom: 1px solid #e8e4dc; padding: 14px; }
+  .cart-item-name { color: #2d2b38; font-size: 14px; }
+  .cart-item-price { color: #d4a017; font-size: 13px; }
+  .cart-total { color: #2d2b38; font-size: 16px; }
+  .upi-option { background: #f4f1ea; color: #2d2b38; border: 1px solid #ddd8ce; padding: 8px 16px; border-radius: 8px; font-size: 13px; }
+  .upi-option:hover { border-color: #d4a017; }
+  .btn-primary { background: linear-gradient(135deg, #d4a017, #b8860b); color: white; font-size: 15px; padding: 12px 20px; border-radius: 10px; font-weight: 600; }
+  .btn-primary:hover { box-shadow: 0 4px 16px rgba(212,160,23,0.3); }
+  .btn-cancel { background: #f4f1ea; color: #5a5768; font-size: 15px; padding: 12px 20px; border-radius: 10px; }
+  .btn-cancel:hover { background: #e8e4dc; }
+  .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="cust-header">
+  <div class="cust-header-inner">
+    <div class="cust-logo">
+      <div class="logo-icon">L</div>
+      <h2>Lodgings<span>.</span></h2>
+    </div>
+    <nav class="cust-nav">
+      <a class="cust-nav-item active" onclick="custNavigate('food')"><i class="fas fa-utensils"></i> Food</a>
+      <a class="cust-nav-item" onclick="custNavigate('rooms')"><i class="fas fa-bed"></i> Rooms</a>
+      <a class="cust-nav-item" onclick="custNavigate('location')"><i class="fas fa-map-marked-alt"></i> Location</a>
+      <a class="cust-nav-item" onclick="custNavigate('highlights')"><i class="fas fa-star"></i> Highlights</a>
+      <a class="cust-nav-item" onclick="custNavigate('stays')"><i class="fas fa-clock"></i> My Stays</a>
+    </nav>
+    <div class="cust-header-right">
+      <button class="cart-btn" onclick="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <div class="cust-user">
+        <div class="avatar" id="custAvatar">G</div>
+        <span id="custName">Guest</span>
+        <a href="/login" style="color:#8a8798;font-size:12px;margin-left:8px;"><i class="fas fa-sign-out-alt"></i></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== CUSTOMER CONTENT ===== -->
+<div class="cust-content">
+
+  <!-- ===== ORDER FOOD ===== -->
+  <section class="cust-section active" id="cust-food">
+    <div class="cust-hero-bg">
+      <div><h1>Delicious Food, <span>Delivered to You</span></h1><p>Explore handcrafted dishes from the freshest ingredients.</p></div>
+    </div>
+    <div class="cust-section-inner">
+      <div class="food-tabs">
+        <button class="food-tab active" onclick="switchFoodTab('breakfast')"><i class="fas fa-sun icon-bright"></i> Breakfast</button>
+        <button class="food-tab" onclick="switchFoodTab('lunch')"><i class="fas fa-cloud-sun icon-bright"></i> Lunch</button>
+        <button class="food-tab" onclick="switchFoodTab('dinner')"><i class="fas fa-moon icon-bright"></i> Dinner</button>
+        <button class="food-tab" onclick="switchFoodTab('dessert')"><i class="fas fa-birthday-cake icon-bright"></i> Dessert</button>
+      </div>
+      <div class="food-grid" id="custFoodGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== BOOK ROOM ===== -->
+  <section class="cust-section" id="cust-rooms">
+    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.7),rgba(45,42,56,0.35)),url('https://images.unsplash.com/photo-1562778612-e1e0cda9915c?w=1600&q=80');">
+      <div><h1>Book Your <span>Stay</span></h1><p>Comfortable rooms &amp; special event packages at Lavasa.</p></div>
+    </div>
+    <div class="cust-section-inner">
+      <h3 class="section-title"><i class="fas fa-bed icon-blue"></i> Accommodation</h3>
+      <div class="room-grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));">
+        <div class="room-card" data-room="single"><img src="https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=600&q=80" alt="Single Room" loading="lazy"><div class="room-info"><h4>Single Room</h4><p class="room-desc">Cozy single bed with work desk, AC, and valley view. Perfect for solo travelers.</p><div class="room-meta"><span><i class="fas fa-user icon-blue"></i> 1 Guest</span><span><i class="fas fa-wifi icon-blue"></i> Free WiFi</span><span><i class="fas fa-tv icon-blue"></i> Smart TV</span></div><div class="room-price">₹2,499<span>/night</span></div><button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="openRoomBooking('single')"><i class="fas fa-calendar-check icon-bright"></i> Book Now</button></div></div>
+        <div class="room-card" data-room="double"><img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600&q=80" alt="Double Room" loading="lazy"><div class="room-info"><h4>Double Room</h4><p class="room-desc">Spacious queen bed with sofa, attached bathroom. Ideal for couples.</p><div class="room-meta"><span><i class="fas fa-user icon-blue"></i> 2 Guests</span><span><i class="fas fa-tv icon-blue"></i> Smart TV</span><span><i class="fas fa-coffee icon-blue"></i> Tea Maker</span></div><div class="room-price">₹3,999<span>/night</span></div><button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="openRoomBooking('double')"><i class="fas fa-calendar-check icon-bright"></i> Book Now</button></div></div>
+        <div class="room-card" data-room="deluxe"><img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&q=80" alt="Deluxe Room" loading="lazy"><div class="room-info"><h4>Deluxe Room</h4><p class="room-desc">Premium king bed, balcony, lake view. Includes complimentary breakfast.</p><div class="room-meta"><span><i class="fas fa-user icon-blue"></i> 2 Guests</span><span><i class="fas fa-coffee icon-blue"></i> Breakfast</span><span><i class="fas fa-wifi icon-blue"></i> Free WiFi</span></div><div class="room-price">₹5,999<span>/night</span></div><button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="openRoomBooking('deluxe')"><i class="fas fa-calendar-check icon-bright"></i> Book Now</button></div></div>
+        <div class="room-card" data-room="suite"><img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?w=600&q=80" alt="Suite" loading="lazy"><div class="room-info"><h4>Executive Suite</h4><p class="room-desc">Luxury living room, jacuzzi, panoramic terrace. The ultimate experience.</p><div class="room-meta"><span><i class="fas fa-user icon-blue"></i> 4 Guests</span><span><i class="fas fa-glass-cheers icon-blue"></i> Mini Bar</span><span><i class="fas fa-hot-tub icon-blue"></i> Jacuzzi</span></div><div class="room-price">₹9,999<span>/night</span></div><button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="openRoomBooking('suite')"><i class="fas fa-calendar-check icon-bright"></i> Book Now</button></div></div>
+        <div class="room-card" data-room="penthouse"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80" alt="Penthouse" loading="lazy"><div class="room-info"><h4>Penthouse</h4><p class="room-desc">Top-floor luxury with private terrace, plunge pool, and 360° mountain views.</p><div class="room-meta"><span><i class="fas fa-user icon-blue"></i> 6 Guests</span><span><i class="fas fa-swimmer icon-blue"></i> Plunge Pool</span><span><i class="fas fa-utensils icon-blue"></i> Private Chef</span></div><div class="room-price">₹15,999<span>/night</span></div><button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="openRoomBooking('penthouse')"><i class="fas fa-calendar-check icon-bright"></i> Book Now</button></div></div>
+        <div class="room-card" data-room="villa"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80" alt="Villa" loading="lazy"><div class="room-info"><h4>Garden Villa</h4><p class="room-desc">Private standalone villa with garden, outdoor dining, and dedicated butler service.</p><div class="room-meta"><span><i class="fas fa-user icon-blue"></i> 8 Guests</span><span><i class="fas fa-tree icon-blue"></i> Private Garden</span><span><i class="fas fa-concierge-bell icon-blue"></i> Butler</span></div><div class="room-price">₹22,999<span>/night</span></div><button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="openRoomBooking('villa')"><i class="fas fa-calendar-check icon-bright"></i> Book Now</button></div></div>
+      </div>
+
+      <h3 class="section-title" style="margin-top:36px;"><i class="fas fa-glass-cheers icon-bright"></i> Special Celebrations</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px;">
+        <div class="special-card" onclick="openEventBooking('birthday')">
+          <div class="special-icon">🎂</div>
+          <h4>Birthday Celebration</h4>
+          <p>Make your birthday unforgettable with cake, decorations, live music, and a private dining setup.</p>
+          <div class="special-price">₹8,999<span> / package</span></div>
+          <button class="btn btn-primary" style="width:100%;"><i class="fas fa-gift icon-bright"></i> Book Birthday</button>
+        </div>
+        <div class="special-card" onclick="openEventBooking('anniversary')">
+          <div class="special-icon">💑</div>
+          <h4>Anniversary Special</h4>
+          <p>Romantic dinner, couple spa, flower decorations, and a luxury room upgrade for your special day.</p>
+          <div class="special-price">₹12,499<span> / package</span></div>
+          <button class="btn btn-primary" style="width:100%;"><i class="fas fa-heart icon-bright"></i> Book Anniversary</button>
+        </div>
+        <div class="special-card" onclick="openEventBooking('date')">
+          <div class="special-icon">🌹</div>
+          <h4>Date Night</h4>
+          <p>Candlelight dinner, wine pairing, lakeside view, and a cozy room setup for a perfect evening.</p>
+          <div class="special-price">₹5,999<span> / couple</span></div>
+          <button class="btn btn-primary" style="width:100%;"><i class="fas fa-wine-glass-alt icon-bright"></i> Book Date Night</button>
+        </div>
+      </div>
+
+      <h3 class="section-title" style="margin-top:36px;"><i class="fas fa-images icon-bright"></i> Property Gallery</h3>
+      <div class="gallery-grid">
+        <img src="https://images.unsplash.com/photo-1562778612-e1e0cda9915c?w=400&q=80" alt="Property" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&q=80" alt="Lobby" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80" alt="Pool" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&q=80" alt="Restaurant" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=400&q=80" alt="Garden" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=400&q=80" alt="Terrace" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LOCATION ===== -->
+  <section class="cust-section" id="cust-location">
+    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.75),rgba(45,42,56,0.5)),url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80');">
+      <div><h1>Our <span>Location</span></h1><p>Find us in the heart of Lavasa — India's最美的 hill station.</p></div>
+    </div>
+    <div class="cust-section-inner">
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:30px;margin-bottom:32px;">
+        <div>
+          <div class="map-container">
+            <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=73.5425%2C18.3995%2C73.5625%2C18.4195&amp;layer=mapnik&amp;marker=18.4095%2C73.5525" width="100%" height="400" frameborder="0" style="border-radius:12px;filter:invert(0.9) hue-rotate(180deg);" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </div>
+        <div>
+          <div class="loc-card" style="margin-bottom:14px;">
+            <div class="loc-icon"><i class="fas fa-map-pin"></i></div>
+            <div><h4>Address</h4><p>Lodgings Resort &amp; Spa, Dasve, Lavasa, Maharashtra - 412112</p></div>
+          </div>
+          <div class="loc-card" style="margin-bottom:14px;">
+            <div class="loc-icon"><i class="fas fa-phone-alt"></i></div>
+            <div><h4>Phone</h4><p>+91-98765-43210</p></div>
+          </div>
+          <div class="loc-card" style="margin-bottom:14px;">
+            <div class="loc-icon"><i class="fas fa-envelope"></i></div>
+            <div><h4>Email</h4><p>reservations@lodgings.in</p></div>
+          </div>
+          <div class="loc-card" style="margin-bottom:14px;">
+            <div class="loc-icon"><i class="fas fa-car"></i></div>
+            <div><h4>How to Reach</h4><p>76 km from Pune Airport (1.5 hrs drive). 185 km from Mumbai (3.5 hrs). Complimentary shuttle from Lavasa bus stand.</p></div>
+          </div>
+          <div class="loc-card">
+            <div class="loc-icon"><i class="fas fa-clock"></i></div>
+            <div><h4>Check-in / Check-out</h4><p>Check-in: 2:00 PM &bull; Check-out: 11:00 AM &bull; Early check-in available on request.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-title"><i class="fas fa-mountain icon-blue"></i> Explore Lavasa</h3>
+      <div class="gallery-grid">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="Lavasa Valley View" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80" alt="Lavasa Lake Vista" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=80" alt="Lavasa Mountain Range" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80" alt="Lavasa Forest Trail" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80" alt="Lavasa Lakeside" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1470071459604-7b8ec44ffd4b?w=400&q=80" alt="Lavasa Sunset" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1440581537323-97a0e2e0ac6b?w=400&q=80" alt="Lavasa Waterfront" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1518173946687-a33f97b8e4c6?w=400&q=80" alt="Lavasa Boating" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HIGHLIGHTS ===== -->
+  <section class="cust-section" id="cust-highlights">
+    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.75),rgba(45,42,56,0.5)),url('https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1600&q=80');">
+      <div><h1>Event <span>Highlights</span></h1><p>Memorable moments from our guests' celebrations at Lodgings.</p></div>
+    </div>
+    <div class="cust-section-inner">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;">
+        <div class="event-card">
+          <img src="https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=600&q=80" alt="Birthday Party" loading="lazy">
+          <div class="event-body">
+            <h4>Riya's 25th Birthday</h4>
+            <p>A vibrant birthday bash with live DJ, custom cake, and poolside decorations.</p>
+            <div class="event-date"><i class="fas fa-calendar-alt icon-bright"></i> 12 May 2026</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80" alt="Wedding Anniversary" loading="lazy">
+          <div class="event-body">
+            <h4>Rahul &amp; Priya — 5th Anniversary</h4>
+            <p>Romantic lakeside dinner with flowers, couple spa, and a surprise fireworks show.</p>
+            <div class="event-date"><i class="fas fa-calendar-alt icon-bright"></i> 28 April 2026</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Date Night" loading="lazy">
+          <div class="event-body">
+            <h4>Date Night — Arjun &amp; Neha</h4>
+            <p>Candlelight dinner with wine pairing and a private balcony overlooking the valley.</p>
+            <div class="event-date"><i class="fas fa-calendar-alt icon-bright"></i> 15 April 2026</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80" alt="Birthday" loading="lazy">
+          <div class="event-body">
+            <h4>Vikram's 40th Birthday Bash</h4>
+            <p>Grand celebration with outdoor barbecue, live band, and a custom 3-tier cake.</p>
+            <div class="event-date"><i class="fas fa-calendar-alt icon-bright"></i> 2 April 2026</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="https://images.unsplash.com/photo-1587271636175-90d58cdad58e?w=600&q=80" alt="Anniversary" loading="lazy">
+          <div class="event-body">
+            <h4>Mr. &amp; Mrs. Sharma — 10th Anniversary</h4>
+            <p>Elegant dinner in the garden pavilion with rose petal decorations and live sitar music.</p>
+            <div class="event-date"><i class="fas fa-calendar-alt icon-bright"></i> 20 March 2026</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&q=80" alt="Concert" loading="lazy">
+          <div class="event-body">
+            <h4>Lavasa Music Night</h4>
+            <p>An evening of live jazz and acoustic performances by the lake with over 200 guests.</p>
+            <div class="event-date"><i class="fas fa-calendar-alt icon-bright"></i> 10 March 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MY STAYS ===== -->
+  <section class="cust-section" id="cust-stays">
+    <div class="cust-hero-bg" style="background:linear-gradient(135deg,rgba(45,42,56,0.75),rgba(45,42,56,0.5)),url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1600&q=80');">
+      <div><h1>My <span>Stays</span></h1><p>Your booking history, food orders, and event bookings at Lodgings.</p></div>
+    </div>
+    <div class="cust-section-inner">
+      <h3 class="section-title"><i class="fas fa-bed icon-blue"></i> Room Bookings</h3>
+      <div id="myRoomBookings"><div class="empty-stays"><i class="fas fa-bed"></i><br>No room bookings yet.</div></div>
+
+      <h3 class="section-title" style="margin-top:28px;"><i class="fas fa-glass-cheers icon-bright"></i> Event Bookings</h3>
+      <div id="myEventBookings"><div class="empty-stays"><i class="fas fa-glass-cheers"></i><br>No event bookings yet.</div></div>
+
+      <h3 class="section-title" style="margin-top:28px;"><i class="fas fa-utensils icon-bright"></i> Food Orders</h3>
+      <div id="myFoodOrders"><div class="empty-stays"><i class="fas fa-shopping-bag"></i><br>No food orders yet.</div></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== CART SIDEBAR ===== -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3><i class="fas fa-shopping-cart icon-bright"></i> Your Cart</h3>
+    <button class="cart-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-items" id="cartItems"><div class="cart-empty">Your cart is empty</div></div>
+  <div class="cart-footer" id="cartFooter" style="display:none;">
+    <div class="cart-total"><span>Total</span><span id="cartTotal">₹0</span></div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="checkout()"><i class="fas fa-lock"></i> Checkout</button>
+  </div>
+</div>
+
+<!-- ===== ROOM BOOKING MODAL ===== -->
+<div class="modal-overlay" id="roomBookModal">
+  <div class="modal" style="max-width:480px;">
+    <h3><i class="fas fa-bed icon-blue"></i> <span id="rbTitle">Book Room</span></h3>
+    <div class="form-group"><label><i class="fas fa-user icon-bright"></i> Full Name</label><input type="text" id="rbName" placeholder="Your name"></div>
+    <div class="form-group"><label><i class="fas fa-envelope icon-bright"></i> Email</label><input type="email" id="rbEmail" placeholder="Your email"></div>
+    <div class="form-group"><label><i class="fas fa-phone icon-bright"></i> Phone</label><input type="text" id="rbPhone" placeholder="Phone number"></div>
+    <div class="form-row">
+      <div class="form-group"><label><i class="fas fa-calendar-check icon-bright"></i> Check-in</label><input type="date" id="rbCheckin"></div>
+      <div class="form-group"><label><i class="fas fa-calendar-times icon-bright"></i> Check-out</label><input type="date" id="rbCheckout"></div>
+    </div>
+    <div class="form-group"><label><i class="fas fa-users icon-bright"></i> Guests</label><input type="number" id="rbGuests" value="1" min="1" max="8"></div>
+    <div id="rbSummary" class="bill-card" style="display:none;">
+      <div class="bill-row"><span><i class="fas fa-bed icon-blue"></i> Room</span><span id="rbRoomLabel">—</span></div>
+      <div class="bill-row"><span><i class="fas fa-moon icon-bright"></i> Nights</span><span id="rbNights">0</span></div>
+      <div class="bill-row total"><span>Total</span><span id="rbTotal">₹0</span></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="closeRoomBooking()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmRoomBooking()"><i class="fas fa-check"></i> Confirm &amp; Pay</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EVENT BOOKING MODAL ===== -->
+<div class="modal-overlay" id="eventBookModal">
+  <div class="modal" style="max-width:480px;">
+    <h3><i class="fas fa-glass-cheers icon-bright"></i> <span id="ebTitle">Book Event</span></h3>
+    <div class="form-group"><label><i class="fas fa-user icon-bright"></i> Full Name</label><input type="text" id="ebName" placeholder="Your name"></div>
+    <div class="form-group"><label><i class="fas fa-envelope icon-bright"></i> Email</label><input type="email" id="ebEmail" placeholder="Your email"></div>
+    <div class="form-group"><label><i class="fas fa-phone icon-bright"></i> Phone</label><input type="text" id="ebPhone" placeholder="Phone number"></div>
+    <div class="form-group"><label><i class="fas fa-calendar-alt icon-bright"></i> Event Date</label><input type="date" id="ebDate"></div>
+    <div class="form-group"><label><i class="fas fa-users icon-bright"></i> Number of Guests</label><input type="number" id="ebGuests" value="10" min="2" max="100"></div>
+    <div id="ebSummary" class="bill-card" style="display:none;">
+      <div class="bill-row"><span><i class="fas fa-glass-cheers icon-blue"></i> Package</span><span id="ebPackageLabel">—</span></div>
+      <div class="bill-row total"><span>Total</span><span id="ebTotal">₹0</span></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="closeEventBooking()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmEventBooking()"><i class="fas fa-check"></i> Confirm &amp; Pay</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAYMENT MODAL ===== -->
+<div class="modal-overlay" id="custPaymentModal">
+  <div class="modal" style="max-width:460px;">
+    <h3><i class="fas fa-credit-card icon-blue"></i> Payment</h3>
+    <div class="payment-tabs">
+      <button class="pay-tab active" onclick="switchCustPayment('card')"><i class="fas fa-credit-card icon-bright"></i> Card</button>
+      <button class="pay-tab" onclick="switchCustPayment('upi')"><i class="fas fa-mobile-alt icon-bright"></i> UPI</button>
+      <button class="pay-tab" onclick="switchCustPayment('netbanking')"><i class="fas fa-university icon-bright"></i> NetBanking</button>
+    </div>
+    <div id="custPayCard" class="pay-section active">
+      <div class="form-group"><label><i class="fas fa-credit-card icon-bright"></i> Card Number</label><input type="text" id="cpCard" placeholder="1234 5678 9012 3456" maxlength="19"></div>
+      <div class="form-row"><div class="form-group"><label><i class="fas fa-calendar icon-bright"></i> Expiry</label><input type="text" id="cpExpiry" placeholder="MM/YY" maxlength="5"></div><div class="form-group"><label><i class="fas fa-lock icon-bright"></i> CVV</label><input type="password" id="cpCvv" placeholder="123" maxlength="4"></div></div>
+      <div class="form-group"><label><i class="fas fa-user icon-bright"></i> Cardholder</label><input type="text" id="cpName" placeholder="Name on card"></div>
+    </div>
+    <div id="custPayUpi" class="pay-section">
+      <div class="form-group"><label><i class="fas fa-mobile-alt icon-bright"></i> UPI ID</label><input type="text" id="cpUpi" placeholder="username@upi"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;"><span class="upi-option" onclick="document.getElementById('cpUpi').value='user@paytm'">Paytm</span><span class="upi-option" onclick="document.getElementById('cpUpi').value='user@googlepay'">Google Pay</span><span class="upi-option" onclick="document.getElementById('cpUpi').value='user@phonepe'">PhonePe</span></div>
+    </div>
+    <div id="custPayNet" class="pay-section"><div class="form-group"><label><i class="fas fa-university icon-bright"></i> Bank</label><select id="cpBank"><option>SBI</option><option>HDFC</option><option>ICICI</option><option>Axis</option><option>Kotak</option><option>PNB</option></select></div></div>
+    <div class="bill-card" style="margin:16px 0 0;"><div class="bill-row total"><span>Amount</span><span id="cpAmount" style="color:#d4a017;">₹0</span></div></div>
+    <div class="form-actions"><button class="btn btn-cancel" onclick="closeCustPayment()">Cancel</button><button class="btn btn-primary" onclick="processCustPayment()"><i class="fas fa-lock"></i> Pay Now</button></div>
+  </div>
+</div>
+
+<!-- ===== SUCCESS MODAL ===== -->
+<div class="modal-overlay" id="custSuccessModal">
+  <div class="modal" style="max-width:420px;text-align:center;">
+    <div style="font-size:56px;color:#00c853;margin-bottom:10px;"><i class="fas fa-check-circle"></i></div>
+    <h3 id="successTitle">Order Placed!</h3>
+    <p style="color:#5a5768;font-size:14px;" id="successMsg">Your order has been placed successfully.</p>
+    <div class="bill-card" style="text-align:left;margin:16px 0;" id="successDetails"></div>
+    <button class="btn btn-primary" onclick="closeSuccess()" style="margin-top:8px;">Done</button>
+  </div>
+</div>
+
+<script>
+const userData = JSON.parse(sessionStorage.getItem('lodgings_user') || '{}');
+if (userData.name) { document.getElementById('custName').textContent = userData.name; document.getElementById('custAvatar').textContent = userData.name.charAt(0).toUpperCase(); }
+if (!userData.role) { window.location.href = '/login'; }
+
+function custNavigate(page) {
+  document.querySelectorAll('.cust-nav-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.cust-section').forEach(s => s.classList.remove('active'));
+  document.querySelector(`.cust-nav-item[onclick*="'${page}'"]`).classList.add('active');
+  document.getElementById('cust-' + page).classList.add('active');
+  if (page === 'stays') renderMyStays();
+}
+
+const foodData = [
+  { id: 1, name: 'Masala Dosa', meal: 'breakfast', desc: 'Crispy rice crepe with spiced potato filling, served with coconut chutney and sambar.', price: 220, img: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400&q=80', avail: true },
+  { id: 2, name: 'Pancake Stack', meal: 'breakfast', desc: 'Fluffy buttermilk pancakes with maple syrup, fresh berries, and whipped butter.', price: 350, img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80', avail: true },
+  { id: 3, name: 'Avocado Toast', meal: 'breakfast', desc: 'Sourdough toast with smashed avocado, poached egg, cherry tomatoes, and microgreens.', price: 280, img: 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=400&q=80', avail: true },
+  { id: 4, name: 'Fruit Bowl', meal: 'breakfast', desc: 'Fresh seasonal fruits with yogurt, honey, granola, and mint garnish.', price: 190, img: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=80', avail: true },
+  { id: 5, name: 'Chicken Biryani', meal: 'lunch', desc: 'Fragrant basmati rice layered with spiced chicken, caramelized onions, and saffron.', price: 520, img: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&q=80', avail: true },
+  { id: 6, name: 'Paneer Butter Masala', meal: 'lunch', desc: 'Rich and creamy tomato-based curry with cottage cheese cubes, butter, and aromatic spices.', price: 380, img: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&q=80', avail: true },
+  { id: 7, name: 'Grilled Sandwich', meal: 'lunch', desc: 'Toasted ciabatta with grilled vegetables, mozzarella, pesto, and balsamic glaze.', price: 320, img: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&q=80', avail: true },
+  { id: 8, name: 'Caesar Salad', meal: 'lunch', desc: 'Crisp romaine lettuce with parmesan, croutons, grilled chicken, and house-made dressing.', price: 290, img: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&q=80', avail: true },
+  { id: 9, name: 'Grilled Salmon', meal: 'dinner', desc: 'Atlantic salmon fillet with lemon butter sauce, seasonal vegetables, and herbed rice.', price: 890, img: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80', avail: true },
+  { id: 10, name: 'Steak au Poivre', meal: 'dinner', desc: 'Prime ribeye with peppercorn cream sauce, roasted potatoes, and sauteed asparagus.', price: 1200, img: 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80', avail: true },
+  { id: 11, name: 'Pasta Alfredo', meal: 'dinner', desc: 'Fettuccine in creamy parmesan sauce with garlic, mushrooms, and grilled chicken.', price: 480, img: 'https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=400&q=80', avail: true },
+  { id: 12, name: 'Tom Yum Soup', meal: 'dinner', desc: 'Hot and sour Thai soup with shrimp, mushrooms, lemongrass, and galangal.', price: 380, img: 'https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=400&q=80', avail: true },
+  { id: 13, name: 'Chocolate Lava Cake', meal: 'dessert', desc: 'Warm chocolate cake with molten center, vanilla ice cream, and raspberry coulis.', price: 320, img: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&q=80', avail: true },
+  { id: 14, name: 'Tiramisu', meal: 'dessert', desc: 'Classic Italian dessert with espresso-soaked ladyfingers, mascarpone, and cocoa dusting.', price: 280, img: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&q=80', avail: true },
+  { id: 15, name: 'Gulab Jamun', meal: 'dessert', desc: 'Deep-fried milk dumplings soaked in rose-scented sugar syrup, served warm.', price: 180, img: 'https://images.unsplash.com/photo-1666190050260-2703a2cc9c55?w=400&q=80', avail: true },
+  { id: 16, name: 'Mango Cheesecake', meal: 'dessert', desc: 'Creamy mango cheesecake on a buttery graham crust with mango glaze topping.', price: 350, img: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400&q=80', avail: true },
+];
+let currentFoodTab = 'breakfast', cart = [], customerBooking = null, eventBooking = null;
+
+function renderCustomerFood(cat) {
+  const grid = document.getElementById('custFoodGrid');
+  grid.innerHTML = foodData.filter(f => f.meal === cat && f.avail).map(f =>
+    `<div class="food-card"><img src="${f.img}" alt="${f.name}" loading="lazy"><span class="food-badge">${cat}</span><div class="food-body"><h4>${f.name}</h4><p>${f.desc}</p><div class="food-footer"><span class="food-price">₹${f.price}</span><div class="food-qty"><button onclick="cartQty(${f.id},-1)" style="background:#f4f1ea;border:1px solid #ddd8ce;color:#5a5768;width:30px;height:30px;border-radius:6px;cursor:pointer;">−</button><span id="cqty-${f.id}" style="min-width:24px;text-align:center;font-weight:600;color:#2d2b38;">0</span><button onclick="cartQty(${f.id},1)" style="background:linear-gradient(135deg,#d4a017,#b8860b);border:none;color:white;width:30px;height:30px;border-radius:6px;cursor:pointer;">+</button></div></div><button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="addToCart(${f.id})"><i class="fas fa-cart-plus"></i> Add to Cart</button></div></div>`
+  ).join('');
+}
+
+function switchFoodTab(cat) { currentFoodTab = cat; document.querySelectorAll('.food-tab').forEach(t => t.classList.remove('active')); document.querySelector(`.food-tab[onclick*="'${cat}'"]`).classList.add('active'); renderCustomerFood(cat); }
+
+function cartQty(id, d) { const e = document.getElementById('cqty-' + id); let q = parseInt(e.textContent) || 0; e.textContent = Math.max(0, q + d); }
+function addToCart(id) { const q = parseInt(document.getElementById('cqty-' + id).textContent) || 0; if (q < 1) { alert('Select at least 1 item'); return; } const item = foodData.find(f => f.id === id); const ex = cart.find(c => c.id === id); if (ex) ex.qty += q; else cart.push({ ...item, qty: q }); document.getElementById('cqty-' + id).textContent = '0'; updateCartUI(); }
+
+function updateCartUI() {
+  const badge = document.getElementById('cartBadge'), total = cart.reduce((s, c) => s + c.qty, 0); badge.textContent = total;
+  const items = document.getElementById('cartItems'), footer = document.getElementById('cartFooter');
+  if (!cart.length) { items.innerHTML = '<div class="cart-empty">Your cart is empty</div>'; footer.style.display = 'none'; return; }
+  footer.style.display = 'block'; let html = '', grand = 0;
+  cart.forEach((c, i) => { const t = c.price * c.qty; grand += t; html += `<div class="cart-item"><img src="${c.img}"><div class="cart-item-info"><div class="cart-item-name">${c.name}</div><div class="cart-item-price">₹${c.price} x ${c.qty} = ₹${t}</div></div><button class="cart-item-del" onclick="removeCartItem(${i})"><i class="fas fa-trash-alt"></i></button></div>`; });
+  items.innerHTML = html; document.getElementById('cartTotal').textContent = '₹' + grand.toLocaleString();
+}
+function removeCartItem(i) { cart.splice(i, 1); updateCartUI(); }
+function toggleCart() { document.getElementById('cartOverlay').classList.toggle('open'); document.getElementById('cartSidebar').classList.toggle('open'); }
+function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartSidebar').classList.remove('open'); }
+function checkout() { if (!cart.length) { alert('Cart is empty'); return; } closeCart(); const a = cart.reduce((s, c) => s + c.price * c.qty, 0); document.getElementById('cpAmount').textContent = '₹' + a.toLocaleString(); document.getElementById('custPaymentModal').classList.add('open'); }
+
+function switchCustPayment(m) { document.querySelectorAll('#custPaymentModal .pay-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#custPaymentModal .pay-section').forEach(s => s.classList.remove('active')); document.querySelector(`#custPaymentModal .pay-tab[onclick*="'${m}'"]`).classList.add('active'); const map = { card: 'custPayCard', upi: 'custPayUpi', netbanking: 'custPayNet' }; document.getElementById(map[m]).classList.add('active'); }
+function closeCustPayment() { document.getElementById('custPaymentModal').classList.remove('open'); }
+
+function processCustPayment() {
+  const method = document.querySelector('#custPaymentModal .pay-tab.active'), methodName = method ? method.textContent.trim() : 'Card';
+  document.getElementById('custPaymentModal').classList.remove('open');
+  if (eventBooking) {
+    const b = eventBooking;
+    const events = JSON.parse(localStorage.getItem('lodgings_events') || '[]');
+    events.unshift({ ...b, id: '#EVT' + String(Date.now()).slice(-6), date: new Date().toISOString(), payment: methodName });
+    localStorage.setItem('lodgings_events', JSON.stringify(events));
+    document.getElementById('successTitle').textContent = 'Event Booked!';
+    document.getElementById('successMsg').textContent = 'Your event has been booked successfully.';
+    document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Booking ID</span><span>#EVT${String(Date.now()).slice(-6)}</span></div><div class="bill-row"><span><i class="fas fa-glass-cheers icon-blue"></i> Package</span><span>${b.label}</span></div><div class="bill-row"><span><i class="fas fa-user icon-bright"></i> Host</span><span>${b.name}</span></div><div class="bill-row"><span><i class="fas fa-calendar-alt icon-bright"></i> Date</span><span>${b.date}</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Paid</span><span style="color:#d4a017;">₹${b.total.toLocaleString()}</span></div>`;
+    eventBooking = null; document.getElementById('custSuccessModal').classList.add('open'); return;
+  }
+  if (customerBooking) {
+    const b = customerBooking;
+    const bookings = JSON.parse(localStorage.getItem('lodgings_bookings') || '[]');
+    bookings.unshift({ ...b, id: '#BK' + String(Date.now()).slice(-6), date: new Date().toISOString(), payment: methodName });
+    localStorage.setItem('lodgings_bookings', JSON.stringify(bookings));
+    document.getElementById('successTitle').textContent = 'Room Booked!'; document.getElementById('successMsg').textContent = 'Your room has been booked successfully.';
+    document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Booking ID</span><span>#BK${String(Date.now()).slice(-6)}</span></div><div class="bill-row"><span><i class="fas fa-bed icon-blue"></i> Room</span><span>${b.label}</span></div><div class="bill-row"><span><i class="fas fa-user icon-bright"></i> Guest</span><span>${b.name}</span></div><div class="bill-row"><span><i class="fas fa-calendar-check icon-bright"></i> Check-in</span><span>${b.checkin}</span></div><div class="bill-row"><span><i class="fas fa-calendar-times icon-bright"></i> Check-out</span><span>${b.checkout}</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Paid</span><span style="color:#d4a017;">₹${b.total.toLocaleString()}</span></div>`;
+    customerBooking = null; document.getElementById('custSuccessModal').classList.add('open'); return;
+  }
+  const orderId = '#ORD' + String(Date.now()).slice(-6); const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const orders = JSON.parse(localStorage.getItem('lodgings_orders') || '[]');
+  orders.unshift({ id: orderId, items: cart.map(c => ({ name: c.name, qty: c.qty, price: c.price })), total, date: new Date().toISOString(), payment: methodName });
+  localStorage.setItem('lodgings_orders', JSON.stringify(orders));
+  document.getElementById('successTitle').textContent = 'Order Placed!'; document.getElementById('successMsg').textContent = 'Your food order has been placed successfully.';
+  document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Order ID</span><span>${orderId}</span></div><div class="bill-row"><span><i class="fas fa-shopping-bag icon-bright"></i> Items</span><span>${cart.reduce((s, c) => s + c.qty, 0)} items</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Total Paid</span><span style="color:#d4a017;">₹${total.toLocaleString()}</span></div>`;
+  cart = []; updateCartUI(); document.getElementById('custSuccessModal').classList.add('open');
+}
+function closeSuccess() { document.getElementById('custSuccessModal').classList.remove('open'); }
+
+const custRoomPrices = { single: 2499, double: 3999, deluxe: 5999, suite: 9999, penthouse: 15999, villa: 22999 };
+const custRoomLabels = { single: 'Single Room', double: 'Double Room', deluxe: 'Deluxe Room', suite: 'Executive Suite', penthouse: 'Penthouse', villa: 'Garden Villa' };
+function openRoomBooking(type) { document.getElementById('rbTitle').textContent = 'Book ' + custRoomLabels[type]; document.getElementById('roomBookModal').classList.add('open'); document.getElementById('rbSummary').style.display = 'none'; document.getElementById('roomBookModal').dataset.roomType = type; }
+function closeRoomBooking() { document.getElementById('roomBookModal').classList.remove('open'); }
+function confirmRoomBooking() {
+  const type = document.getElementById('roomBookModal').dataset.roomType, name = document.getElementById('rbName').value.trim(), email = document.getElementById('rbEmail').value.trim(), phone = document.getElementById('rbPhone').value.trim(), checkin = document.getElementById('rbCheckin').value, checkout = document.getElementById('rbCheckout').value, guests = document.getElementById('rbGuests').value;
+  if (!name || !email || !phone || !checkin || !checkout) { alert('Please fill all fields'); return; }
+  const d1 = new Date(checkin), d2 = new Date(checkout);
+  if (d2 <= d1) { alert('Check-out must be after check-in'); return; }
+  const nights = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)), total = custRoomPrices[type] * nights;
+  customerBooking = { name, email, phone, checkin, checkout, guests, nights, total, label: custRoomLabels[type] };
+  document.getElementById('rbRoomLabel').textContent = custRoomLabels[type]; document.getElementById('rbNights').textContent = nights; document.getElementById('rbTotal').textContent = '₹' + total.toLocaleString(); document.getElementById('rbSummary').style.display = 'block';
+  document.getElementById('roomBookModal').classList.remove('open'); document.getElementById('cpAmount').textContent = '₹' + total.toLocaleString(); document.getElementById('custPaymentModal').classList.add('open');
+}
+
+// Event booking
+const eventPrices = { birthday: 8999, anniversary: 12499, date: 5999 };
+const eventLabels = { birthday: 'Birthday Celebration Package', anniversary: 'Anniversary Special Package', date: 'Date Night Package' };
+function openEventBooking(type) { document.getElementById('ebTitle').textContent = 'Book ' + eventLabels[type]; document.getElementById('eventBookModal').classList.add('open'); document.getElementById('ebSummary').style.display = 'none'; document.getElementById('eventBookModal').dataset.eventType = type; }
+function closeEventBooking() { document.getElementById('eventBookModal').classList.remove('open'); }
+function confirmEventBooking() {
+  const type = document.getElementById('eventBookModal').dataset.eventType, name = document.getElementById('ebName').value.trim(), email = document.getElementById('ebEmail').value.trim(), phone = document.getElementById('ebPhone').value.trim(), date = document.getElementById('ebDate').value, guests = document.getElementById('ebGuests').value;
+  if (!name || !email || !phone || !date) { alert('Please fill all fields'); return; }
+  const total = eventPrices[type];
+  eventBooking = { name, email, phone, date, guests, total, label: eventLabels[type] };
+  document.getElementById('ebPackageLabel').textContent = eventLabels[type]; document.getElementById('ebTotal').textContent = '₹' + total.toLocaleString(); document.getElementById('ebSummary').style.display = 'block';
+  document.getElementById('eventBookModal').classList.remove('open'); document.getElementById('cpAmount').textContent = '₹' + total.toLocaleString(); document.getElementById('custPaymentModal').classList.add('open');
+}
+
+// My Stays
+function renderMyStays() {
+  const bookings = JSON.parse(localStorage.getItem('lodgings_bookings') || '[]');
+  const rbEl = document.getElementById('myRoomBookings');
+  if (!bookings.length) rbEl.innerHTML = '<div class="empty-stays"><i class="fas fa-bed"></i><br>No room bookings yet.</div>';
+  else rbEl.innerHTML = bookings.map(b => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-bed icon-blue"></i> ${b.label}</h4><span class="stay-badge room">${b.id}</span></div><div class="stay-body"><div class="stay-row"><span><i class="fas fa-calendar-check icon-bright"></i> Check-in</span><span>${b.checkin}</span></div><div class="stay-row"><span><i class="fas fa-calendar-times icon-bright"></i> Check-out</span><span>${b.checkout}</span></div><div class="stay-row"><span><i class="fas fa-moon icon-bright"></i> Nights</span><span>${b.nights}</span></div><div class="stay-row"><span><i class="fas fa-user icon-blue"></i> Guest</span><span>${b.name}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${b.total.toLocaleString()}</span></div></div></div>`).join('');
+
+  const events = JSON.parse(localStorage.getItem('lodgings_events') || '[]');
+  const evEl = document.getElementById('myEventBookings');
+  if (!events.length) evEl.innerHTML = '<div class="empty-stays"><i class="fas fa-glass-cheers"></i><br>No event bookings yet.</div>';
+  else evEl.innerHTML = events.map(e => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-glass-cheers icon-bright"></i> ${e.label}</h4><span class="stay-badge room">${e.id}</span></div><div class="stay-body"><div class="stay-row"><span><i class="fas fa-calendar-alt icon-bright"></i> Date</span><span>${e.date}</span></div><div class="stay-row"><span><i class="fas fa-user icon-blue"></i> Host</span><span>${e.name}</span></div><div class="stay-row"><span><i class="fas fa-users icon-bright"></i> Guests</span><span>${e.guests}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${e.total.toLocaleString()}</span></div></div></div>`).join('');
+
+  const orders = JSON.parse(localStorage.getItem('lodgings_orders') || '[]');
+  const foEl = document.getElementById('myFoodOrders');
+  if (!orders.length) foEl.innerHTML = '<div class="empty-stays"><i class="fas fa-shopping-bag"></i><br>No food orders yet.</div>';
+  else foEl.innerHTML = orders.map(o => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-shopping-bag icon-bright"></i> Food Order</h4><span class="stay-badge food">${o.id}</span></div><div class="stay-body"><div class="stay-row"><span>Items</span><span>${o.items.map(i => i.name + ' x' + i.qty).join(', ')}</span></div><div class="stay-row"><span>Payment</span><span>${o.payment}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${o.total.toLocaleString()}</span></div></div></div>`).join('');
+}
+
+renderCustomerFood('breakfast');
+</script>
+
+<!-- ===== CHAT WIDGET ===== -->
+<div id="chatFab" onclick="toggleChat()">
+  <i class="fas fa-comment-dots"></i>
+</div>
+
+<div id="chatPanel" class="chat-panel">
+  <div class="chat-header">
+    <div class="chat-header-info">
+      <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+      <div>
+        <div class="chat-title">Lodgings Assistant</div>
+        <div class="chat-status">Online</div>
+      </div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg msg-bot">
+      <div class="msg-content">👋 Hi! I'm the **Lodgings Assistant**. I can help you book rooms, order food, or plan events. What would you like to do?</div>
+    </div>
+  </div>
+  <div class="chat-typing" id="chatTyping" style="display:none;">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendChat()">
+    <button class="chat-send" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<style>
+#chatFab {
+  position: fixed; bottom: 28px; right: 28px; width: 58px; height: 58px;
+  background: linear-gradient(135deg, #4f8cff, #2563eb); color: white;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 26px; cursor: pointer; box-shadow: 0 6px 24px rgba(79,140,255,0.4);
+  z-index: 999; transition: all 0.3s; border: none;
+}
+#chatFab:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(79,140,255,0.6); }
+.chat-panel {
+  position: fixed; bottom: 100px; right: 28px; width: 380px; max-height: 560px;
+  background: #0d1137; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; box-shadow: 0 16px 60px rgba(0,0,0,0.6);
+  display: none; flex-direction: column; z-index: 1000; overflow: hidden;
+}
+.chat-panel.open { display: flex; }
+.chat-header {
+  background: linear-gradient(135deg, #0d1137, #151a3a); padding: 16px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.chat-header-info { display: flex; align-items: center; gap: 12px; }
+.chat-avatar { width: 38px; height: 38px; background: rgba(79,140,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4f8cff; font-size: 18px; }
+.chat-title { font-weight: 600; font-size: 14px; }
+.chat-status { font-size: 11px; color: #00c853; display: flex; align-items: center; gap: 4px; }
+.chat-status::before { content: ''; width: 6px; height: 6px; background: #00c853; border-radius: 50%; display: inline-block; }
+.chat-close { background: none; border: none; color: #8890b0; font-size: 18px; cursor: pointer; padding: 4px; }
+.chat-close:hover { color: white; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; max-height: 360px; }
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.msg { display: flex; flex-direction: column; max-width: 85%; animation: msgIn 0.3s ease; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.msg-bot { align-self: flex-start; }
+.msg-user { align-self: flex-end; }
+.msg-content {
+  padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.5; white-space: pre-wrap;
+}
+.msg-bot .msg-content {
+  background: rgba(255,255,255,0.06); color: #e8eaf6; border-bottom-left-radius: 4px;
+}
+.msg-user .msg-content {
+  background: linear-gradient(135deg, #4f8cff, #2563eb); color: white; border-bottom-right-radius: 4px;
+}
+.msg-content strong { color: #d4a017; }
+.chat-typing { padding: 8px 16px; display: flex; gap: 4px; align-items: center; }
+.chat-typing span { width: 8px; height: 8px; background: #8890b0; border-radius: 50%; animation: typing 1.4s infinite; }
+.chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,60%,100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-4px); } }
+.chat-input-area { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.06); }
+.chat-input { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; font-size: 13px; outline: none; }
+.chat-input:focus { border-color: #4f8cff; }
+.chat-input::placeholder { color: #5a6080; }
+.chat-send { width: 38px; height: 38px; background: linear-gradient(135deg, #4f8cff, #2563eb); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.chat-send:hover { transform: scale(1.05); }
+@media (max-width: 480px) {
+  #chatPanel { width: calc(100% - 32px); right: 16px; bottom: 90px; max-height: 70vh; }
+  #chatFab { right: 16px; bottom: 20px; width: 50px; height: 50px; font-size: 22px; }
+}
+</style>
+
+<script>
+let chatSessionId = null;
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById('chatInput').focus();
+    scrollChat();
+  }
+}
+function scrollChat() {
+  const el = document.getElementById('chatMessages');
+  el.scrollTop = el.scrollHeight;
+}
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMessage(msg, 'user');
+  document.getElementById('chatTyping').style.display = 'flex';
+  scrollChat();
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, sessionId: chatSessionId })
+    });
+    const data = await res.json();
+    chatSessionId = data.sessionId;
+    document.getElementById('chatTyping').style.display = 'none';
+    addMessage(data.reply, 'bot');
+  } catch (e) {
+    document.getElementById('chatTyping').style.display = 'none';
+    addMessage('Sorry, I\'m having trouble connecting. Please try again.', 'bot');
+  }
+  scrollChat();
+}
+function addMessage(text, sender) {
+  const el = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + sender;
+  div.innerHTML = '<div class="msg-content">' + text.replace(/\n/g, '<br>') + '</div>';
+  el.appendChild(div);
+  scrollChat();
+}
+</script>
+
+</body>
+</html>

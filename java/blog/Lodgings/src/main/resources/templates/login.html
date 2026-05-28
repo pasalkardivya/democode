@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Lodgings</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .login-page {
+    background: linear-gradient(rgba(10,14,39,0.75), rgba(10,14,39,0.9)),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600');
+    background-size: cover; background-position: center; background-attachment: fixed;
+  }
+  .login-tabs { display: flex; gap: 0; margin-bottom: 28px; border-radius: 12px; overflow: hidden; border: 1px solid var(--navy-border); }
+  .login-tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 500; background: rgba(255,255,255,0.03); color: var(--text-dim); transition: all 0.25s; border: none; }
+  .login-tab.active { background: var(--blue); color: white; }
+  .login-tab i { margin-right: 6px; }
+  .login-form { display: none; }
+  .login-form.active { display: block; }
+  .login-error { color: var(--danger); font-size: 13px; margin-top: 8px; display: none; }
+</style>
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-badge">L</div>
+      <h2>Lodgings<span style="color:var(--yellow);">.</span></h2>
+      <p>Restaurant &amp; Suites</p>
+    </div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchLoginTab('admin')"><i class="fas fa-shield-alt"></i> Admin</button>
+      <button class="login-tab" onclick="switchLoginTab('customer')"><i class="fas fa-user"></i> Customer</button>
+    </div>
+
+    <div class="login-form active" id="loginAdmin">
+      <form onsubmit="return handleLogin(event, 'admin')">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="adminUser" placeholder="Enter admin username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="adminPass" placeholder="Enter admin password" required>
+        </div>
+        <div class="login-error" id="adminError">Invalid credentials. Try again.</div>
+        <button type="submit" class="login-btn"><i class="fas fa-shield-alt" style="margin-right:8px;"></i> Admin Sign In</button>
+      </form>
+    </div>
+
+    <div class="login-form" id="loginCustomer">
+      <form onsubmit="return handleLogin(event, 'customer')">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="custEmail" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="custPass" placeholder="Enter your password" required>
+        </div>
+        <div class="login-error" id="custError">Invalid email or password.</div>
+        <button type="submit" class="login-btn"><i class="fas fa-user" style="margin-right:8px;"></i> Customer Sign In</button>
+      </form>
+      <div class="login-footer" style="margin-top:16px;">
+        <p style="font-size:13px;color:var(--text-dim);">Don't have an account? <a href="#" onclick="alert('Please contact the restaurant to register.');return false;">Register here</a></p>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    function switchLoginTab(tab) {
+      document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+      document.querySelectorAll('.login-error').forEach(e => e.style.display = 'none');
+      document.querySelector('.login-tab[onclick*="' + tab + '"]').classList.add('active');
+      document.getElementById('login' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    }
+    function handleLogin(e, type) {
+      e.preventDefault();
+      if (type === 'admin') {
+        const user = document.getElementById('adminUser').value.trim();
+        const pass = document.getElementById('adminPass').value.trim();
+        if (user === 'pradnya' && pass === 'pradnya') {
+          sessionStorage.setItem('lodgings_user', JSON.stringify({ role: 'admin', name: 'Pradnya' }));
+          window.location.href = '/dashboard';
+        } else {
+          document.getElementById('adminError').style.display = 'block';
+        }
+      } else {
+        const email = document.getElementById('custEmail').value.trim();
+        const pass = document.getElementById('custPass').value.trim();
+        if (email && pass) {
+          sessionStorage.setItem('lodgings_user', JSON.stringify({ role: 'customer', name: email.split('@')[0], email: email }));
+          window.location.href = '/customer';
+        } else {
+          document.getElementById('custError').style.display = 'block';
+        }
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>

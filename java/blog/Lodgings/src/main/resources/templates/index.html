@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lodgings & Restaurant</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+
+    .navbar {
+        position: fixed; top: 0; width: 100%; z-index: 100;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+        color: white; padding: 16px 40px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .navbar .logo { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
+    .navbar .logo span { color: #f59e0b; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: #cbd5e1; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .nav-links a:hover { color: #f59e0b; }
+    .nav-links .btn-api { background: #2563eb; color: white; padding: 8px 18px; border-radius: 6px; font-size: 13px; }
+    .nav-links .btn-api:hover { background: #1d4ed8; color: white; }
+
+    .hero {
+        height: 100vh; min-height: 600px;
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600');
+        background-size: cover; background-position: center;
+        display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        color: white; padding: 20px;
+    }
+    .hero h1 { font-size: 64px; font-weight: 700; margin-bottom: 16px; letter-spacing: 2px; }
+    .hero h1 span { color: #f59e0b; }
+    .hero p { font-size: 20px; color: #e2e8f0; max-width: 600px; margin-bottom: 32px; line-height: 1.6; }
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .hero-buttons a {
+        padding: 14px 32px; border-radius: 8px; text-decoration: none;
+        font-size: 16px; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-primary { background: #f59e0b; color: #0f172a; }
+    .btn-primary:hover { background: #d97706; transform: translateY(-2px); }
+    .btn-secondary { background: transparent; color: white; border: 2px solid white; }
+    .btn-secondary:hover { background: white; color: #0f172a; transform: translateY(-2px); }
+
+    .section { padding: 80px 40px; }
+    .section-dark { background: #1e293b; color: white; }
+    .section-light { background: #f8fafc; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .section-title { text-align: center; margin-bottom: 48px; }
+    .section-title h2 { font-size: 36px; margin-bottom: 12px; }
+    .section-title p { color: #64748b; font-size: 16px; max-width: 600px; margin: 0 auto; }
+    .section-dark .section-title p { color: #94a3b8; }
+
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+    .feature-card {
+        background: white; padding: 40px 30px; border-radius: 12px; text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06); transition: transform 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); }
+    .feature-card .icon { font-size: 40px; margin-bottom: 16px; }
+    .feature-card h3 { color: #0f172a; margin-bottom: 8px; }
+    .feature-card p { color: #64748b; font-size: 14px; line-height: 1.6; }
+
+    .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .menu-item {
+        background: white; border-radius: 12px; overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: transform 0.2s;
+    }
+    .menu-item:hover { transform: translateY(-4px); }
+    .menu-item img { width: 100%; height: 180px; object-fit: cover; }
+    .menu-item-info { padding: 16px 20px 20px; }
+    .menu-item-info h4 { color: #0f172a; margin-bottom: 4px; }
+    .menu-item-info p { color: #64748b; font-size: 13px; margin-bottom: 8px; }
+    .menu-item-info .price { color: #f59e0b; font-size: 18px; font-weight: bold; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; text-align: center; }
+    .stat h3 { font-size: 40px; margin-bottom: 4px; }
+    .stat p { color: #94a3b8; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+    .booking-form {
+        max-width: 700px; margin: 0 auto;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .booking-form input, .booking-form select {
+        padding: 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+        font-size: 14px; width: 100%; outline: none; transition: border 0.2s;
+    }
+    .booking-form input:focus, .booking-form select:focus { border-color: #f59e0b; }
+    .booking-form .full-width { grid-column: span 2; }
+    .booking-form button {
+        grid-column: span 2; padding: 14px; border: none; border-radius: 8px;
+        background: #f59e0b; color: #0f172a; font-size: 16px; font-weight: bold;
+        cursor: pointer; transition: background 0.2s;
+    }
+    .booking-form button:hover { background: #d97706; }
+
+    .testimonial-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+    .testimonial {
+        background: white; padding: 30px; border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .testimonial .stars { color: #f59e0b; font-size: 18px; margin-bottom: 8px; }
+    .testimonial p { color: #475569; line-height: 1.6; margin-bottom: 12px; font-style: italic; }
+    .testimonial .author { font-weight: bold; color: #0f172a; }
+    .testimonial .role { color: #94a3b8; font-size: 13px; }
+
+    footer {
+        background: #0f172a; color: #94a3b8; text-align: center;
+        padding: 40px; font-size: 14px;
+    }
+    footer .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; }
+    footer .footer-links a { color: #94a3b8; text-decoration: none; }
+    footer .footer-links a:hover { color: #f59e0b; }
+
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 36px; }
+        .features, .stats { grid-template-columns: repeat(2, 1fr); }
+        .menu-grid { grid-template-columns: repeat(2, 1fr); }
+        .testimonial-grid { grid-template-columns: 1fr; }
+        .nav-links { display: none; }
+        .booking-form { grid-template-columns: 1fr; }
+        .booking-form .full-width, .booking-form button { grid-column: span 1; }
+    }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">Lodgings<span>.</span></div>
+    <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#menu">Menu</a>
+        <a href="#reservations">Reservations</a>
+        <a href="#contact">Contact</a>
+        <a href="/api-dashboard" class="btn-api">API Dashboard</a>
+    </div>
+</div>
+
+<section class="hero" id="home">
+    <h1>Welcome to <span>Lodgings</span></h1>
+    <p>Experience fine dining & premium lodging in the heart of the city. Where every meal tells a story and every stay feels like home.</p>
+    <div class="hero-buttons">
+        <a href="#reservations" class="btn-primary">Book a Table</a>
+        <a href="#menu" class="btn-secondary">Explore Menu</a>
+    </div>
+</section>
+
+<section class="section section-light" id="about">
+    <div class="container">
+        <div class="section-title">
+            <h2>Why Choose Us</h2>
+            <p>We blend culinary excellence with warm hospitality to create unforgettable experiences</p>
+        </div>
+        <div class="features">
+            <div class="feature-card">
+                <div class="icon">&#127860;</div>
+                <h3>Fine Dining</h3>
+                <p>Expert chefs craft exquisite dishes using the freshest local ingredients, delivering a world-class dining experience.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">&#127976;</div>
+                <h3>Premium Lodging</h3>
+                <p>Luxurious rooms with modern amenities, offering the perfect retreat after a long day.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">&#129309;</div>
+                <h3>Event Hosting</h3>
+                <p>From intimate gatherings to grand celebrations, our venue is perfect for any occasion.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section section-dark">
+    <div class="container">
+        <div class="stats">
+            <div class="stat">
+                <h3 style="color:#f59e0b;">120+</h3>
+                <p>Rooms</p>
+            </div>
+            <div class="stat">
+                <h3 style="color:#f59e0b;">85+</h3>
+                <p>Happy Customers</p>
+            </div>
+            <div class="stat">
+                <h3 style="color:#f59e0b;">60+</h3>
+                <p>Daily Bookings</p>
+            </div>
+            <div class="stat">
+                <h3 style="color:#f59e0b;">4.8</h3>
+                <p>Customer Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section section-light" id="menu">
+    <div class="container">
+        <div class="section-title">
+            <h2>Signature Menu</h2>
+            <p>Discover our chef's special creations crafted to delight your taste buds</p>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-item">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400" alt="Pizza">
+                <div class="menu-item-info">
+                    <h4>Margherita Pizza</h4>
+                    <p>Fresh mozzarella, basil, tomato sauce</p>
+                    <div class="price">&#8377;450</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=400" alt="Burger">
+                <div class="menu-item-info">
+                    <h4>Spiced Burger</h4>
+                    <p>Chargrilled patty with house sauce</p>
+                    <div class="price">&#8377;350</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" alt="Pasta">
+                <div class="menu-item-info">
+                    <h4>Creamy Alfredo</h4>
+                    <p>Fettuccine in rich parmesan cream</p>
+                    <div class="price">&#8377;520</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400" alt="Dessert">
+                <div class="menu-item-info">
+                    <h4>Chocolate Lava</h4>
+                    <p>Warm molten cake with ice cream</p>
+                    <div class="price">&#8377;320</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="reservations">
+    <div class="container">
+        <div class="section-title">
+            <h2>Book a Table</h2>
+            <p>Reserve your spot for an unforgettable dining experience</p>
+        </div>
+        <form class="booking-form">
+            <input type="text" placeholder="Your Name" required>
+            <input type="tel" placeholder="Phone Number" required>
+            <select>
+                <option>Select Room Type</option>
+                <option>Single</option>
+                <option>Double</option>
+                <option>Deluxe</option>
+                <option>Suite</option>
+            </select>
+            <input type="number" placeholder="Number of Guests" min="1" max="20">
+            <input type="date" class="full-width">
+            <input type="time" class="full-width">
+            <textarea placeholder="Special Requests..." class="full-width" style="padding:14px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; resize:vertical;" rows="3"></textarea>
+            <button type="submit">Confirm Reservation</button>
+        </form>
+    </div>
+</section>
+
+<section class="section section-light" id="contact">
+    <div class="container">
+        <div class="section-title">
+            <h2>What Our Guests Say</h2>
+            <p>Real reviews from our valued guests</p>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p>"Absolutely amazing! The food was exquisite and the service was impeccable. The ambiance made our anniversary dinner truly special."</p>
+                <div class="author">Priya Sharma</div>
+                <div class="role">Regular Guest</div>
+            </div>
+            <div class="testimonial">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p>"Stayed for a weekend and it was fantastic. The rooms are luxurious, and the rooftop restaurant has the best view in town. Highly recommended!"</p>
+                <div class="author">Rahul Verma</div>
+                <div class="role">Business Traveler</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#menu">Menu</a>
+        <a href="#reservations">Reservations</a>
+        <a href="/api-dashboard">API Dashboard</a>
+    </div>
+    <p>&copy; 2026 Lodgings & Restaurant. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
