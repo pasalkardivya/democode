@@ -30,6 +30,8 @@ public class Customer {
 
     private String time;
 
+    private String password;
+
     public Customer() {
     }
 
@@ -41,7 +43,8 @@ public class Customer {
                     String email,
                     String gender,
                     String date,
-                    String time) {
+                    String time,
+                    String password) {
 
         this.id = id;
         this.name = name;
@@ -52,6 +55,7 @@ public class Customer {
         this.gender = gender;
         this.date = date;
         this.time = time;
+        this.password = password;
     }
 
     public Long getId() {
@@ -124,5 +128,13 @@ public class Customer {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

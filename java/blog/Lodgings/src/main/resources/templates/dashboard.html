@@ -29,10 +29,12 @@
     <a class="nav-item" data-page="customers"><i class="fas fa-user-friends"></i> Customers</a>
     <a class="nav-item" data-page="reports"><i class="fas fa-file-alt"></i> Reports</a>
     <div class="nav-label">System</div>
+    <a class="nav-item" data-page="events"><i class="fas fa-glass-cheers"></i> Events</a>
+    <a class="nav-item" data-page="logins"><i class="fas fa-history"></i> Login Logs</a>
     <a class="nav-item" data-page="chatbot"><i class="fas fa-robot"></i> Chatbot</a>
     <a class="nav-item" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
     <a class="nav-item" href="/api-dashboard"><i class="fas fa-plug"></i> API Dashboard</a>
-    <a class="nav-item" href="/login" style="margin-top:8px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <a class="nav-item" href="#" onclick="handleLogout()" style="margin-top:8px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </nav>
 </aside>
 
@@ -505,6 +507,34 @@
       </div>
     </section>
 
+    <!-- ====== EVENTS ====== -->
+    <section class="page-section" id="page-events">
+      <h1><i class="fas fa-glass-cheers" style="color:var(--yellow);"></i> Event Bookings</h1>
+      <p class="subtitle">View all customer event bookings from the customer portal.</p>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Package</th><th>Host</th><th>Email</th><th>Phone</th><th>Date</th><th>Guests</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+            <tbody id="eventsBody"><tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-dim);">Loading events...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== LOGIN LOGS ====== -->
+    <section class="page-section" id="page-logins">
+      <h1><i class="fas fa-history" style="color:var(--blue);"></i> Login Logs</h1>
+      <p class="subtitle">Track all user logins from admin and customer portals.</p>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Login Time</th><th>Logout Time</th></tr></thead>
+            <tbody id="loginsBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-dim);">Loading logs...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- ====== CHATBOT ====== -->
     <section class="page-section" id="page-chatbot">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
@@ -702,26 +732,121 @@
 <script src="/js/main.js"></script>
 <script src="/js/charts.js"></script>
 <script>
+async function handleLogout() {
+  try {
+    const user = JSON.parse(sessionStorage.getItem('lodgings_user') || '{}');
+    if (user.sessionId) {
+      await fetch('/api/data/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: user.sessionId })
+      });
+    }
+  } catch(e) {}
+  sessionStorage.clear();
+  window.location.href = '/login';
+}
+
+async function loadDashboardData() {
+  try {
+    // Stats
+    const statsRes = await fetch('/api/data/stats');
+    const stats = await statsRes.json();
+    const statEls = document.querySelectorAll('#page-dashboard .stat-value');
+    if (statEls.length >= 6) {
+      statEls[0].textContent = '₹' + (stats.totalBookings * 5000 + stats.totalOrders * 400 + stats.totalEvents * 8000).toLocaleString();
+      statEls[1].textContent = stats.totalOrders;
+      statEls[2].textContent = stats.totalCustomers;
+      statEls[3].textContent = '16';
+      const activeOrders = stats.totalOrders - (stats.totalOrders > 0 ? Math.floor(stats.totalOrders * 0.3) : 0);
+      statEls[4].textContent = activeOrders;
+      statEls[5].textContent = stats.totalLogins;
+    }
+
+    // Customers table
+    const custRes = await fetch('/api/data/stats');
+    const custData = await custRes.json();
+    const custBody = document.getElementById('page-customers')?.querySelector('tbody');
+    if (custBody) {
+      const cRes = await fetch('/customers');
+      const customers = await cRes.json();
+      if (customers.length) {
+        custBody.innerHTML = customers.map(c => `<tr><td>${c.name||''}</td><td>${c.email||''}</td><td>${c.phoneNo||'N/A'}</td><td>1</td><td>—</td><td><span class="status active">New</span></td></tr>`).join('');
+      }
+    }
+
+    // Bookings table in Booking section
+    const bookRes = await fetch('/api/data/bookings');
+    const bookings = await bookRes.json();
+    const bookingSection = document.getElementById('page-booking');
+    if (bookingSection && bookings.length) {
+      let html = '<h3 style="margin:32px 0 14px;">All Bookings</h3><div class="table-card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Guest</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead><tbody>';
+      bookings.forEach(b => {
+        html += `<tr><td>#BK${b.id}</td><td>${b.guestName||''}</td><td>${b.roomType||''}</td><td>${b.checkin||''}</td><td>${b.checkout||''}</td><td>₹${Number(b.total).toLocaleString()}</td><td>${b.paymentMethod||'—'}</td><td><span class="status active">${b.status||'confirmed'}</span></td></tr>`;
+      });
+      html += '</tbody></table></div></div>';
+      bookingSection.insertAdjacentHTML('beforeend', html);
+    }
+
+    // Orders table in Orders section
+    const ordRes = await fetch('/api/data/orders');
+    const orders = await ordRes.json();
+    const ordBody = document.getElementById('ordersTableBody');
+    if (ordBody && orders.length) {
+      ordBody.innerHTML = orders.map(o => {
+        const items = JSON.parse(o.items||'[]');
+        const itemStr = items.map(i => i.name).join(', ');
+        return `<tr><td>#ORD${o.id}</td><td>${o.customerName||''}</td><td>—</td><td>${itemStr}</td><td>₹${Number(o.total).toLocaleString()}</td><td><span class="status active">${o.status||'confirmed'}</span></td><td><button class="btn-sm" style="background:rgba(255,193,7,0.1);color:var(--warning);border:1px solid rgba(255,193,7,0.2);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;">View</button></td></tr>`;
+      }).join('');
+    }
+
+    // Dashboard Recent Orders
+    const dashOrdBody = document.getElementById('dashboardOrdersBody');
+    if (dashOrdBody && orders.length) {
+      dashOrdBody.innerHTML = orders.slice(0, 5).map(o => `<tr><td>#ORD${o.id}</td><td>${o.customerName||''}</td><td><span class="status active">${o.status||'confirmed'}</span></td><td>₹${Number(o.total).toLocaleString()}</td></tr>`).join('');
+    }
+
+    // Events table
+    const evRes = await fetch('/api/data/events');
+    const events = await evRes.json();
+    const evBody = document.getElementById('eventsBody');
+    if (evBody) {
+      if (!events.length) evBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-dim);">No event bookings yet.</td></tr>';
+      else evBody.innerHTML = events.map(e => `<tr><td>#EVT${e.id}</td><td>${e.packageType||''}</td><td>${e.hostName||''}</td><td>${e.email||''}</td><td>${e.phone||''}</td><td>${e.eventDate||''}</td><td>${e.guests||0}</td><td>₹${Number(e.total).toLocaleString()}</td><td>${e.paymentMethod||'—'}</td><td><span class="status active">${e.status||'confirmed'}</span></td></tr>`).join('');
+    }
+
+    // Login Logs table
+    const logRes = await fetch('/api/data/logs');
+    const logs = await logRes.json();
+    const logBody = document.getElementById('loginsBody');
+    if (logBody) {
+      if (!logs.length) logBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-dim);">No login logs yet.</td></tr>';
+      else logBody.innerHTML = logs.map(l => `<tr><td>${l.id}</td><td>${l.name||''}</td><td>${l.email||''}</td><td><span class="status ${l.role==='admin'?'active':'pending'}">${l.role||''}</span></td><td style="font-size:12px;">${l.loginTime ? new Date(l.loginTime).toLocaleString() : ''}</td><td style="font-size:12px;color:var(--text-dim);">${l.logoutTime ? new Date(l.logoutTime).toLocaleString() : 'Active'}</td></tr>`).join('');
+    }
+  } catch(e) { console.error('Dashboard load error:', e); }
+}
+
 // Daily sales table
 document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.getElementById('dailySalesBody');
-  if (!tbody) return;
-  const data = [
-    {date:'28 May',orders:42,revenue:10200,avg:243,growth:'+8.2%'},
-    {date:'27 May',orders:38,revenue:9400,avg:247,growth:'+3.1%'},
-    {date:'26 May',orders:35,revenue:9100,avg:260,growth:'+4.5%'},
-    {date:'25 May',orders:33,revenue:8700,avg:264,growth:'-1.2%'},
-    {date:'24 May',orders:36,revenue:8800,avg:244,growth:'+6.8%'},
-  ];
-  tbody.innerHTML = data.map(d => `
-    <tr>
-      <td>${d.date}</td>
-      <td>${d.orders}</td>
-      <td>₹${d.revenue.toLocaleString()}</td>
-      <td>₹${d.avg}</td>
-      <td style="color:${d.growth.startsWith('+') ? 'var(--success)' : 'var(--danger)'}">${d.growth}</td>
-    </tr>
-  `).join('');
+  if (tbody) {
+    const data = [
+      {date:'28 May',orders:42,revenue:10200,avg:243,growth:'+8.2%'},
+      {date:'27 May',orders:38,revenue:9400,avg:247,growth:'+3.1%'},
+      {date:'26 May',orders:35,revenue:9100,avg:260,growth:'+4.5%'},
+      {date:'25 May',orders:33,revenue:8700,avg:264,growth:'-1.2%'},
+      {date:'24 May',orders:36,revenue:8800,avg:244,growth:'+6.8%'},
+    ];
+    tbody.innerHTML = data.map(d => `
+      <tr>
+        <td>${d.date}</td>
+        <td>${d.orders}</td>
+        <td>₹${d.revenue.toLocaleString()}</td>
+        <td>₹${d.avg}</td>
+        <td style="color:${d.growth.startsWith('+') ? 'var(--success)' : 'var(--danger)'}">${d.growth}</td>
+      </tr>
+    `).join('');
+  }
 });
 
 function filterMenu(val) {
@@ -759,6 +884,7 @@ async function refreshChatbot() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  loadDashboardData();
   const chatbotPage = document.getElementById('page-chatbot');
   if (chatbotPage) refreshChatbot();
 });

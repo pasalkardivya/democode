@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="/css/style.css">
 <style>
+  *, *::before, *::after { box-sizing: border-box; }
   body { background: #f4f1ea; overflow-x: hidden; margin: 0; color: #2d2b38; }
   .cust-header-inner { max-width: 1400px !important; margin: 0 auto !important; padding: 18px 40px; }
   .cust-content { width: 100%; max-width: 100% !important; padding: 0; }
@@ -113,17 +114,22 @@
   .room-meta span { color: #5a5768; background: #f4f1ea; font-size: 13px; padding: 5px 12px; }
   .room-price { color: #d4a017; font-size: 24px; }
   .room-price span { color: #8a8798; font-size: 13px; }
-  .food-tabs { border-bottom: 2px solid #e8e4dc; margin-bottom: 24px; }
+  .food-tabs { border-bottom: 2px solid #e8e4dc; margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 4px; }
   .food-tab { color: #5a5768; font-size: 15px; padding: 10px 24px; }
   .food-tab:hover { color: #d4a017; }
   .food-tab.active { color: #d4a017; border-bottom-color: #d4a017; }
-  .food-card { background: white; border: 1px solid #e8e4dc; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 14px; overflow: hidden; }
-  .food-card .food-body { padding: 16px 18px; }
-  .food-card .food-body h4 { color: #2d2b38; font-size: 16px; }
-  .food-card .food-body p { color: #5a5768; font-size: 13px; }
-  .food-price { color: #d4a017; font-size: 18px; }
-  .food-badge { background: #fef7e0; color: #d4a017; font-size: 11px; padding: 4px 12px; }
-  .modal { background: white; border-radius: 16px; }
+  .food-card { background: white; border: 1px solid #e8e4dc; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .food-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+  .food-card .food-body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; }
+  .food-card .food-body h4 { color: #2d2b38; font-size: 16px; margin-bottom: 4px; }
+  .food-card .food-body p { color: #5a5768; font-size: 13px; line-height: 1.5; margin-bottom: 10px; flex: 1; }
+  .food-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 8px; }
+  .food-qty { display: flex; align-items: center; gap: 4px; }
+  .food-price { color: #d4a017; font-size: 18px; font-weight: 600; }
+  .food-badge { background: #fef7e0; color: #d4a017; font-size: 11px; padding: 4px 12px; border-radius: 0 0 8px 0; position: absolute; }
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 16px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; }
   .modal h3 { color: #2d2b38; font-size: 20px; }
   .modal label { color: #5a5768; font-size: 14px; }
   .modal input, .modal select { background: #f4f1ea; border: 1px solid #ddd8ce; color: #2d2b38; padding: 12px 14px; border-radius: 8px; font-size: 14px; }
@@ -132,7 +138,13 @@
   .bill-row { color: #2d2b38; font-size: 14px; }
   .pay-tab { color: #5a5768; background: #f4f1ea; font-size: 14px; padding: 10px 18px; }
   .pay-tab.active { background: #d4a017; color: white; }
-  .cart-sidebar { background: white; }
+  .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; }
+  .cart-overlay.open { display: block; }
+  .cart-sidebar { position: fixed; top: 0; right: 0; width: 380px; max-width: 100%; height: 100%; background: white; z-index: 999; box-shadow: -4px 0 24px rgba(0,0,0,0.1); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease; }
+  .cart-sidebar.open { transform: translateX(0); }
+  .cart-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #5a5768; padding: 4px; }
+  .cart-empty { text-align: center; padding: 60px 20px; color: #8a8798; font-size: 14px; }
+  @media (max-width: 480px) { .cart-sidebar { width: 100%; } }
   .cart-header { background: #fef7e0; padding: 18px 20px; }
   .cart-header h3 { font-size: 18px; }
   .cart-item { border-bottom: 1px solid #e8e4dc; padding: 14px; }
@@ -162,7 +174,7 @@
       <a class="cust-nav-item" onclick="custNavigate('rooms')"><i class="fas fa-bed"></i> Rooms</a>
       <a class="cust-nav-item" onclick="custNavigate('location')"><i class="fas fa-map-marked-alt"></i> Location</a>
       <a class="cust-nav-item" onclick="custNavigate('highlights')"><i class="fas fa-star"></i> Highlights</a>
-      <a class="cust-nav-item" onclick="custNavigate('stays')"><i class="fas fa-clock"></i> My Stays</a>
+      <a class="cust-nav-item" onclick="custNavigate('stays')"><i class="fas fa-id-card"></i> My Details</a>
     </nav>
     <div class="cust-header-right">
       <button class="cart-btn" onclick="toggleCart()">
@@ -172,7 +184,7 @@
       <div class="cust-user">
         <div class="avatar" id="custAvatar">G</div>
         <span id="custName">Guest</span>
-        <a href="/login" style="color:rgba(255,255,255,0.5);font-size:12px;margin-left:8px;"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="#" onclick="handleCustomerLogout()" style="color:rgba(255,255,255,0.5);font-size:12px;margin-left:8px;"><i class="fas fa-sign-out-alt"></i></a>
       </div>
     </div>
   </div>
@@ -358,6 +370,10 @@
   <!-- ===== MY STAYS ===== -->
   <section class="cust-section" id="cust-stays">
     <div class="cust-section-inner">
+      <div class="stay-card" style="margin-bottom:28px;border-left:4px solid #d4a017;">
+        <h4 style="font-size:18px;font-weight:600;color:#2d2b38;"><i class="fas fa-user-circle icon-bright"></i> Welcome, <span id="detailName">Guest</span></h4>
+        <p style="color:#5a5768;font-size:14px;margin-top:4px;"><i class="fas fa-envelope icon-blue"></i> <span id="detailEmail">-</span> &nbsp; <i class="fas fa-phone icon-bright"></i> <span id="detailPhone">-</span></p>
+      </div>
       <h3 class="section-title"><i class="fas fa-bed icon-blue"></i> Room Bookings</h3>
       <div id="myRoomBookings"><div class="empty-stays"><i class="fas fa-bed"></i><br>No room bookings yet.</div></div>
 
@@ -429,6 +445,24 @@
   </div>
 </div>
 
+<!-- ===== FOOD ORDER DETAILS MODAL ===== -->
+<div class="modal-overlay" id="foodDetailModal">
+  <div class="modal" style="max-width:480px;">
+    <h3><i class="fas fa-shopping-bag icon-bright"></i> Order Details</h3>
+    <div class="form-group"><label><i class="fas fa-user icon-bright"></i> Full Name</label><input type="text" id="fdName" placeholder="Your name"></div>
+    <div class="form-group"><label><i class="fas fa-envelope icon-bright"></i> Email</label><input type="email" id="fdEmail" placeholder="Your email"></div>
+    <div class="form-group"><label><i class="fas fa-phone icon-bright"></i> Phone</label><input type="text" id="fdPhone" placeholder="Phone number"></div>
+    <div class="bill-card" style="margin:16px 0;" id="fdSummary">
+      <div class="bill-row"><span><i class="fas fa-shopping-bag icon-blue"></i> Items</span><span id="fdItems">0</span></div>
+      <div class="bill-row total"><span>Total</span><span id="fdTotal" style="color:#d4a017;">₹0</span></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="closeFoodDetail()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmFoodDetail()"><i class="fas fa-arrow-right"></i> Continue to Payment</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== PAYMENT MODAL ===== -->
 <div class="modal-overlay" id="custPaymentModal">
   <div class="modal" style="max-width:460px;">
@@ -469,12 +503,18 @@ const userData = JSON.parse(sessionStorage.getItem('lodgings_user') || '{}');
 if (userData.name) { document.getElementById('custName').textContent = userData.name; document.getElementById('custAvatar').textContent = userData.name.charAt(0).toUpperCase(); }
 if (!userData.role) { window.location.href = '/login'; }
 
+async function handleCustomerLogout() {
+  try { if (userData.sessionId) { await fetch('/api/data/logout', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sessionId:userData.sessionId}) }); } } catch(e) {}
+  sessionStorage.clear();
+  window.location.href = '/login';
+}
+
 const heroContent = {
   food: { title: 'Delicious Food, <span>Delivered to You</span>', sub: 'Explore handcrafted dishes from the freshest ingredients.' },
   rooms: { title: 'Book Your <span>Stay</span>', sub: 'Comfortable rooms &amp; special event packages at Lavasa.' },
   location: { title: 'Our <span>Location</span>', sub: 'Find us in the heart of Lavasa — India\'s最美的 hill station.' },
   highlights: { title: 'Event <span>Highlights</span>', sub: 'Memorable moments from our guests\' celebrations at Lodgings.' },
-  stays: { title: 'My <span>Stays</span>', sub: 'Your booking history, food orders, and event bookings at Lodgings.' }
+  stays: { title: 'My <span>Details</span>', sub: 'Your personal bookings, food orders, and event history at Lodgings.' }
 };
 function custNavigate(page) {
   document.querySelectorAll('.cust-nav-item').forEach(i => i.classList.remove('active'));
@@ -509,7 +549,7 @@ let currentFoodTab = 'breakfast', cart = [], customerBooking = null, eventBookin
 function renderCustomerFood(cat) {
   const grid = document.getElementById('custFoodGrid');
   grid.innerHTML = foodData.filter(f => f.meal === cat && f.avail).map(f =>
-    `<div class="food-card"><img src="${f.img}" alt="${f.name}" loading="lazy"><span class="food-badge">${cat}</span><div class="food-body"><h4>${f.name}</h4><p>${f.desc}</p><div class="food-footer"><span class="food-price">₹${f.price}</span><div class="food-qty"><button onclick="cartQty(${f.id},-1)" style="background:#f4f1ea;border:1px solid #ddd8ce;color:#5a5768;width:30px;height:30px;border-radius:6px;cursor:pointer;">−</button><span id="cqty-${f.id}" style="min-width:24px;text-align:center;font-weight:600;color:#2d2b38;">0</span><button onclick="cartQty(${f.id},1)" style="background:linear-gradient(135deg,#d4a017,#b8860b);border:none;color:white;width:30px;height:30px;border-radius:6px;cursor:pointer;">+</button></div></div><button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="addToCart(${f.id})"><i class="fas fa-cart-plus"></i> Add to Cart</button></div></div>`
+    `<div class="food-card" style="position:relative;"><img src="${f.img}" alt="${f.name}" loading="lazy"><span class="food-badge">${cat}</span><div class="food-body"><h4>${f.name}</h4><p>${f.desc}</p><div class="food-footer"><span class="food-price">₹${f.price}</span><div class="food-qty"><button onclick="cartQty(${f.id},-1)" style="background:#f4f1ea;border:1px solid #ddd8ce;color:#5a5768;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">−</button><span id="cqty-${f.id}" style="min-width:28px;text-align:center;font-weight:700;font-size:15px;color:#2d2b38;">0</span><button onclick="cartQty(${f.id},1)" style="background:linear-gradient(135deg,#d4a017,#b8860b);border:none;color:white;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">+</button></div></div><button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="addToCart(${f.id})"><i class="fas fa-cart-plus"></i> Add to Cart</button></div></div>`
   ).join('');
 }
 
@@ -529,40 +569,85 @@ function updateCartUI() {
 function removeCartItem(i) { cart.splice(i, 1); updateCartUI(); }
 function toggleCart() { document.getElementById('cartOverlay').classList.toggle('open'); document.getElementById('cartSidebar').classList.toggle('open'); }
 function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartSidebar').classList.remove('open'); }
-function checkout() { if (!cart.length) { alert('Cart is empty'); return; } closeCart(); const a = cart.reduce((s, c) => s + c.price * c.qty, 0); document.getElementById('cpAmount').textContent = '₹' + a.toLocaleString(); document.getElementById('custPaymentModal').classList.add('open'); }
+function checkout() {
+  if (!cart.length) { alert('Cart is empty'); return; }
+  closeCart();
+  const a = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const itemsCount = cart.reduce((s, c) => s + c.qty, 0);
+  document.getElementById('fdItems').textContent = itemsCount + ' items';
+  document.getElementById('fdTotal').textContent = '₹' + a.toLocaleString();
+  document.getElementById('fdName').value = userData.name || '';
+  document.getElementById('fdEmail').value = userEmail;
+  document.getElementById('fdPhone').value = '';
+  document.getElementById('foodDetailModal').classList.add('open');
+}
+let foodOrderDetails = null;
+function confirmFoodDetail() {
+  const name = document.getElementById('fdName').value.trim();
+  const email = document.getElementById('fdEmail').value.trim();
+  const phone = document.getElementById('fdPhone').value.trim();
+  if (!name || !email || !phone) { alert('Please fill all fields'); return; }
+  const a = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  foodOrderDetails = { name, email, phone };
+  document.getElementById('foodDetailModal').classList.remove('open');
+  document.getElementById('cpAmount').textContent = '₹' + a.toLocaleString();
+  document.getElementById('custPaymentModal').classList.add('open');
+}
+function closeFoodDetail() { document.getElementById('foodDetailModal').classList.remove('open'); }
 
 function switchCustPayment(m) { document.querySelectorAll('#custPaymentModal .pay-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#custPaymentModal .pay-section').forEach(s => s.classList.remove('active')); document.querySelector(`#custPaymentModal .pay-tab[onclick*="'${m}'"]`).classList.add('active'); const map = { card: 'custPayCard', upi: 'custPayUpi', netbanking: 'custPayNet' }; document.getElementById(map[m]).classList.add('active'); }
 function closeCustPayment() { document.getElementById('custPaymentModal').classList.remove('open'); }
 
-function processCustPayment() {
+const userEmail = (sessionStorage.getItem('lodgings_user') || '{}').includes('email') ? JSON.parse(sessionStorage.getItem('lodgings_user')).email : 'guest@lodgings.in';
+
+async function processCustPayment() {
   const method = document.querySelector('#custPaymentModal .pay-tab.active'), methodName = method ? method.textContent.trim() : 'Card';
   document.getElementById('custPaymentModal').classList.remove('open');
   if (eventBooking) {
     const b = eventBooking;
-    const events = JSON.parse(localStorage.getItem('lodgings_events') || '[]');
-    events.unshift({ ...b, id: '#EVT' + String(Date.now()).slice(-6), date: new Date().toISOString(), payment: methodName });
-    localStorage.setItem('lodgings_events', JSON.stringify(events));
-    document.getElementById('successTitle').textContent = 'Event Booked!';
-    document.getElementById('successMsg').textContent = 'Your event has been booked successfully.';
-    document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Booking ID</span><span>#EVT${String(Date.now()).slice(-6)}</span></div><div class="bill-row"><span><i class="fas fa-glass-cheers icon-blue"></i> Package</span><span>${b.label}</span></div><div class="bill-row"><span><i class="fas fa-user icon-bright"></i> Host</span><span>${b.name}</span></div><div class="bill-row"><span><i class="fas fa-calendar-alt icon-bright"></i> Date</span><span>${b.date}</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Paid</span><span style="color:#d4a017;">₹${b.total.toLocaleString()}</span></div>`;
+    try {
+      const res = await fetch('/api/data/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packageType: b.label, hostName: b.name, email: b.email, phone: b.phone, eventDate: b.date, guests: parseInt(b.guests)||10, total: b.total, paymentMethod: methodName })
+      });
+      const saved = await res.json();
+      document.getElementById('successTitle').textContent = 'Event Booked!';
+      document.getElementById('successMsg').textContent = 'Your event has been booked successfully.';
+      document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Booking ID</span><span>#EVT${saved.id}</span></div><div class="bill-row"><span><i class="fas fa-glass-cheers icon-blue"></i> Package</span><span>${b.label}</span></div><div class="bill-row"><span><i class="fas fa-user icon-bright"></i> Host</span><span>${b.name}</span></div><div class="bill-row"><span><i class="fas fa-calendar-alt icon-bright"></i> Date</span><span>${b.date}</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Paid</span><span style="color:#d4a017;">₹${b.total.toLocaleString()}</span></div>`;
+    } catch(e) { alert('Failed to save booking'); }
     eventBooking = null; document.getElementById('custSuccessModal').classList.add('open'); return;
   }
   if (customerBooking) {
     const b = customerBooking;
-    const bookings = JSON.parse(localStorage.getItem('lodgings_bookings') || '[]');
-    bookings.unshift({ ...b, id: '#BK' + String(Date.now()).slice(-6), date: new Date().toISOString(), payment: methodName });
-    localStorage.setItem('lodgings_bookings', JSON.stringify(bookings));
-    document.getElementById('successTitle').textContent = 'Room Booked!'; document.getElementById('successMsg').textContent = 'Your room has been booked successfully.';
-    document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Booking ID</span><span>#BK${String(Date.now()).slice(-6)}</span></div><div class="bill-row"><span><i class="fas fa-bed icon-blue"></i> Room</span><span>${b.label}</span></div><div class="bill-row"><span><i class="fas fa-user icon-bright"></i> Guest</span><span>${b.name}</span></div><div class="bill-row"><span><i class="fas fa-calendar-check icon-bright"></i> Check-in</span><span>${b.checkin}</span></div><div class="bill-row"><span><i class="fas fa-calendar-times icon-bright"></i> Check-out</span><span>${b.checkout}</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Paid</span><span style="color:#d4a017;">₹${b.total.toLocaleString()}</span></div>`;
+    try {
+      const res = await fetch('/api/data/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomType: b.label, guestName: b.name, email: b.email, phone: b.phone, checkin: b.checkin, checkout: b.checkout, guests: parseInt(b.guests), nights: b.nights, total: b.total, paymentMethod: methodName })
+      });
+      const saved = await res.json();
+      document.getElementById('successTitle').textContent = 'Room Booked!';
+      document.getElementById('successMsg').textContent = 'Your room has been booked successfully.';
+      document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Booking ID</span><span>#BK${saved.id}</span></div><div class="bill-row"><span><i class="fas fa-bed icon-blue"></i> Room</span><span>${b.label}</span></div><div class="bill-row"><span><i class="fas fa-user icon-bright"></i> Guest</span><span>${b.name}</span></div><div class="bill-row"><span><i class="fas fa-calendar-check icon-bright"></i> Check-in</span><span>${b.checkin}</span></div><div class="bill-row"><span><i class="fas fa-calendar-times icon-bright"></i> Check-out</span><span>${b.checkout}</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Paid</span><span style="color:#d4a017;">₹${b.total.toLocaleString()}</span></div>`;
+    } catch(e) { alert('Failed to save booking'); }
     customerBooking = null; document.getElementById('custSuccessModal').classList.add('open'); return;
   }
-  const orderId = '#ORD' + String(Date.now()).slice(-6); const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
-  const orders = JSON.parse(localStorage.getItem('lodgings_orders') || '[]');
-  orders.unshift({ id: orderId, items: cart.map(c => ({ name: c.name, qty: c.qty, price: c.price })), total, date: new Date().toISOString(), payment: methodName });
-  localStorage.setItem('lodgings_orders', JSON.stringify(orders));
-  document.getElementById('successTitle').textContent = 'Order Placed!'; document.getElementById('successMsg').textContent = 'Your food order has been placed successfully.';
-  document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Order ID</span><span>${orderId}</span></div><div class="bill-row"><span><i class="fas fa-shopping-bag icon-bright"></i> Items</span><span>${cart.reduce((s, c) => s + c.qty, 0)} items</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Total Paid</span><span style="color:#d4a017;">₹${total.toLocaleString()}</span></div>`;
-  cart = []; updateCartUI(); document.getElementById('custSuccessModal').classList.add('open');
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const items = cart.map(c => ({ name: c.name, qty: c.qty, price: c.price }));
+  const fd = foodOrderDetails || { name: userEmail.split('@')[0], email: userEmail, phone: '' };
+  try {
+    const res = await fetch('/api/data/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: JSON.stringify(items), total, customerName: fd.name, email: fd.email, phone: fd.phone, paymentMethod: methodName })
+    });
+    const saved = await res.json();
+    document.getElementById('successTitle').textContent = 'Order Placed!';
+    document.getElementById('successMsg').textContent = 'Your food order has been placed successfully.';
+    document.getElementById('successDetails').innerHTML = `<div class="bill-row"><span>Order ID</span><span>#ORD${saved.id}</span></div><div class="bill-row"><span><i class="fas fa-user icon-bright"></i> Name</span><span>${fd.name}</span></div><div class="bill-row"><span><i class="fas fa-envelope icon-bright"></i> Email</span><span>${fd.email}</span></div><div class="bill-row"><span><i class="fas fa-phone icon-bright"></i> Phone</span><span>${fd.phone}</span></div><div class="bill-row"><span><i class="fas fa-shopping-bag icon-bright"></i> Items</span><span>${cart.reduce((s, c) => s + c.qty, 0)} items</span></div><div class="bill-row"><span><i class="fas fa-credit-card icon-blue"></i> Payment</span><span>${methodName}</span></div><div class="bill-row total"><span>Total Paid</span><span style="color:#d4a017;">?${total.toLocaleString()}</span></div>`;
+  } catch(e) { alert('Failed to save order'); }
+  foodOrderDetails = null; cart = []; updateCartUI(); document.getElementById('custSuccessModal').classList.add('open');
 }
 function closeSuccess() { document.getElementById('custSuccessModal').classList.remove('open'); }
 
@@ -595,22 +680,36 @@ function confirmEventBooking() {
   document.getElementById('eventBookModal').classList.remove('open'); document.getElementById('cpAmount').textContent = '₹' + total.toLocaleString(); document.getElementById('custPaymentModal').classList.add('open');
 }
 
-// My Stays
-function renderMyStays() {
-  const bookings = JSON.parse(localStorage.getItem('lodgings_bookings') || '[]');
+// My Details
+async function renderMyStays() {
+  document.getElementById('detailName').textContent = userData.name || 'Guest';
+  document.getElementById('detailEmail').textContent = userData.email || '-';
+  document.getElementById('detailPhone').textContent = userData.phone || '-';
   const rbEl = document.getElementById('myRoomBookings');
-  if (!bookings.length) rbEl.innerHTML = '<div class="empty-stays"><i class="fas fa-bed"></i><br>No room bookings yet.</div>';
-  else rbEl.innerHTML = bookings.map(b => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-bed icon-blue"></i> ${b.label}</h4><span class="stay-badge room">${b.id}</span></div><div class="stay-body"><div class="stay-row"><span><i class="fas fa-calendar-check icon-bright"></i> Check-in</span><span>${b.checkin}</span></div><div class="stay-row"><span><i class="fas fa-calendar-times icon-bright"></i> Check-out</span><span>${b.checkout}</span></div><div class="stay-row"><span><i class="fas fa-moon icon-bright"></i> Nights</span><span>${b.nights}</span></div><div class="stay-row"><span><i class="fas fa-user icon-blue"></i> Guest</span><span>${b.name}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${b.total.toLocaleString()}</span></div></div></div>`).join('');
-
-  const events = JSON.parse(localStorage.getItem('lodgings_events') || '[]');
   const evEl = document.getElementById('myEventBookings');
-  if (!events.length) evEl.innerHTML = '<div class="empty-stays"><i class="fas fa-glass-cheers"></i><br>No event bookings yet.</div>';
-  else evEl.innerHTML = events.map(e => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-glass-cheers icon-bright"></i> ${e.label}</h4><span class="stay-badge room">${e.id}</span></div><div class="stay-body"><div class="stay-row"><span><i class="fas fa-calendar-alt icon-bright"></i> Date</span><span>${e.date}</span></div><div class="stay-row"><span><i class="fas fa-user icon-blue"></i> Host</span><span>${e.name}</span></div><div class="stay-row"><span><i class="fas fa-users icon-bright"></i> Guests</span><span>${e.guests}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${e.total.toLocaleString()}</span></div></div></div>`).join('');
-
-  const orders = JSON.parse(localStorage.getItem('lodgings_orders') || '[]');
   const foEl = document.getElementById('myFoodOrders');
-  if (!orders.length) foEl.innerHTML = '<div class="empty-stays"><i class="fas fa-shopping-bag"></i><br>No food orders yet.</div>';
-  else foEl.innerHTML = orders.map(o => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-shopping-bag icon-bright"></i> Food Order</h4><span class="stay-badge food">${o.id}</span></div><div class="stay-body"><div class="stay-row"><span>Items</span><span>${o.items.map(i => i.name + ' x' + i.qty).join(', ')}</span></div><div class="stay-row"><span>Payment</span><span>${o.payment}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${o.total.toLocaleString()}</span></div></div></div>`).join('');
+  try {
+    const [bookingsRes, eventsRes, ordersRes] = await Promise.all([
+      fetch('/api/data/bookings?email=' + encodeURIComponent(userEmail)),
+      fetch('/api/data/events?email=' + encodeURIComponent(userEmail)),
+      fetch('/api/data/orders?email=' + encodeURIComponent(userEmail))
+    ]);
+    const bookings = await bookingsRes.json();
+    const events = await eventsRes.json();
+    const orders = await ordersRes.json();
+
+    if (!bookings.length) rbEl.innerHTML = '<div class="empty-stays"><i class="fas fa-bed"></i><br>No room bookings yet.</div>';
+    else rbEl.innerHTML = bookings.map(b => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-bed icon-blue"></i> ${b.roomType}</h4><span class="stay-badge room">#BK${b.id}</span></div><div class="stay-body"><div class="stay-row"><span><i class="fas fa-calendar-check icon-bright"></i> Check-in</span><span>${b.checkin}</span></div><div class="stay-row"><span><i class="fas fa-calendar-times icon-bright"></i> Check-out</span><span>${b.checkout}</span></div><div class="stay-row"><span><i class="fas fa-moon icon-bright"></i> Nights</span><span>${b.nights}</span></div><div class="stay-row"><span><i class="fas fa-user icon-blue"></i> Guest</span><span>${b.guestName}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${Number(b.total).toLocaleString()}</span></div></div></div>`).join('');
+
+    if (!events.length) evEl.innerHTML = '<div class="empty-stays"><i class="fas fa-glass-cheers"></i><br>No event bookings yet.</div>';
+    else evEl.innerHTML = events.map(e => `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-glass-cheers icon-bright"></i> ${e.packageType}</h4><span class="stay-badge room">#EVT${e.id}</span></div><div class="stay-body"><div class="stay-row"><span><i class="fas fa-calendar-alt icon-bright"></i> Date</span><span>${e.eventDate}</span></div><div class="stay-row"><span><i class="fas fa-user icon-blue"></i> Host</span><span>${e.hostName}</span></div><div class="stay-row"><span><i class="fas fa-users icon-bright"></i> Guests</span><span>${e.guests}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${Number(e.total).toLocaleString()}</span></div></div></div>`).join('');
+
+    if (!orders.length) foEl.innerHTML = '<div class="empty-stays"><i class="fas fa-shopping-bag"></i><br>No food orders yet.</div>';
+    else foEl.innerHTML = orders.map(o => { const items = JSON.parse(o.items||'[]'); return `<div class="stay-card"><div class="stay-header"><h4><i class="fas fa-shopping-bag icon-bright"></i> Food Order</h4><span class="stay-badge food">#ORD${o.id}</span></div><div class="stay-body"><div class="stay-row"><span><i class="fas fa-user icon-bright"></i> Name</span><span>${o.customerName || '-'}</span></div><div class="stay-row"><span><i class="fas fa-envelope icon-blue"></i> Email</span><span>${o.email || '-'}</span></div><div class="stay-row"><span><i class="fas fa-phone icon-bright"></i> Phone</span><span>${o.phone || '-'}</span></div><div class="stay-row"><span>Items</span><span>${items.map(i => i.name + ' x' + i.qty).join(', ')}</span></div><div class="stay-row"><span>Payment</span><span>${o.paymentMethod}</span></div><div class="stay-row" style="color:#d4a017;font-weight:600;"><span>Total Paid</span><span>₹${Number(o.total).toLocaleString()}</span></div></div></div>`; }).join('');
+  } catch(e) {
+    rbEl.innerHTML = '<div class="empty-stays"><i class="fas fa-exclamation-triangle"></i><br>Could not load data.</div>';
+    evEl.innerHTML = ''; foEl.innerHTML = '';
+  }
 }
 
 renderCustomerFood('breakfast');
